@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">Med Manager</string>
+    <string name="action_search">Search</string>
+    <string name="action_edit_profile">Edit Profile</string>
+    <string name="action_logout">Log Out</string>
+    <string name="search_hint">Search by name</string>
+
+    <string name="input_name">Enter Name of Medication</string>
+    <string name="input_description">Enter Description</string>
+    <string name="save">Save</string>
+
+    <string name="endDate">Enter End Date</string>
+    <string name="startDate">Enter Start Date</string>
+    <string name="clickHere">Click Here</string>
+    <string name="interval">Interval</string>
+
+    <!-- Font -->
+    <string name="roboto_regular">sans-serif</string>
+    <string name="roboto_light">sans-serif-light</string>
+    <string name="roboto_condensed">sans-serif-condensed</string>
+    <string name="roboto_thin">sans-serif-thin</string>
+    <string name="roboto_medium">sans-serif-medium</string>
+
+    <string name="empty_name">Medication name can\'t be empty</string>
+    <string name="empty_description">Medication description can\'t be empty</string>
+    <string name="empty_field">No date!</string>
 </resources>
