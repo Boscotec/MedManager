@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static com.boscotec.medmanager.Utils.getMonthString;
+
 /**
  * Created by Johnbosco on 23-Mar-18.
  */
@@ -155,8 +157,8 @@ public class DbHelper extends SQLiteOpenHelper {
         return db.insert(MED_TABLE_NAME, null, values);
     }
 
-    public int delete(int id){
-        return db.delete(MED_TABLE_NAME, COLUMN_ID, new String[]{String.valueOf(id)});
+    public int delete(long id){
+        return db.delete(MED_TABLE_NAME, COLUMN_ID+"=?", new String[]{String.valueOf(id)});
     }
 
     public List<RecyclerItem> read(){
@@ -170,7 +172,7 @@ public class DbHelper extends SQLiteOpenHelper {
             int thisMonth = cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH));
 
             MedicineInfo info = new MedicineInfo();
-            info.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
+            info.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
             info.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
             info.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
             info.setInterval(cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)));
@@ -186,6 +188,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
             if(lastMonth != thisMonth){
                   Month month = new Month();
+
                   month.setName(getMonthString(thisMonth));
                   medicineInfos.add(month);
                   lastMonth = thisMonth;
@@ -200,24 +203,6 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public int update(int id, ContentValues values){
         return db.update(MED_TABLE_NAME, values, COLUMN_ID, new String[]{String.valueOf(id)});
-    }
-
-    private String getMonthString(int month){
-        switch(month){
-           case 1: return "JANUARY";
-           case 2: return "FEBRUARY";
-           case 3: return "MARCH";
-           case 4: return "APRIL";
-           case 5: return "MAY";
-           case 6: return "JUNE";
-           case 7: return "JULY";
-           case 8: return "AUGUST";
-           case 9: return "SEPTEMBER";
-           case 10: return "OCTOBER";
-           case 11: return "NOVEMBER";
-           case 12: return "DECEMBER";
-        }
-        return "";
     }
 
 }

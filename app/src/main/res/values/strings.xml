@@ -1,14 +1,14 @@
 <resources>
     <string name="app_name">Med Manager</string>
-    <string name="action_search">Search</string>
+    <string name="search_hint">Search by name</string>
+
+    <string name="action_share">Share</string>
     <string name="action_edit_profile">Edit Profile</string>
     <string name="action_logout">Log Out</string>
-    <string name="search_hint">Search by name</string>
 
     <string name="input_name">Enter Name of Medication</string>
     <string name="input_description">Enter Description</string>
     <string name="save">Save</string>
-
     <string name="endDate">Enter End Date</string>
     <string name="startDate">Enter Start Date</string>
     <string name="clickHere">Click Here</string>

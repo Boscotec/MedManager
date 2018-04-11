@@ -1,11 +1,10 @@
 package com.boscotec.medmanager;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
+import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -15,19 +14,17 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.arlib.floatingsearchview.FloatingSearchView;
 import com.boscotec.medmanager.adapter.MedListAdapter;
 import com.boscotec.medmanager.custom.RecyclerItemDivider;
 import com.boscotec.medmanager.database.DbHelper;
 import com.boscotec.medmanager.interfaces.RecyclerItem;
-import com.boscotec.medmanager.model.MedicineInfo;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -72,12 +69,16 @@ MD5:  87:25:5B:89:76:D2:26:E3:74:1F:4F:B9:4E:3C:C1:EC
 // If you need to pass the currently signed-in user to a backend server,
 // send the ID token to your backend server and validate the token on the server.
 
-public class MainActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<RecyclerItem>>, MedListAdapter.ListItemClickListener, SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener,
+       LoaderManager.LoaderCallbacks<List<RecyclerItem>>, MedListAdapter.ListItemClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private MedListAdapter adapter;
     private GoogleSignInAccount account = null;
+
+    private FloatingSearchView mSearchView;
+    private static final int LOADER_ID = 1;
+    private DbHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,9 +89,11 @@ public class MainActivity extends AppCompatActivity
           account = getIntent().getParcelableExtra("account");
         }
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if(getSupportActionBar() != null){ getSupportActionBar().setDisplayHomeAsUpEnabled(true);}
+        mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
+        AppBarLayout mAppBar = (AppBarLayout) findViewById(R.id.appbar);
+
+        mAppBar.addOnOffsetChangedListener(this);
+        setupSearchBar();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -112,46 +115,80 @@ public class MainActivity extends AppCompatActivity
         adapter = new MedListAdapter(this, this);
         mRecyclerView.setAdapter(adapter);
 
-        DbHelper db = new DbHelper(this);
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT| ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                long id = (long) viewHolder.itemView.getTag();
+                db = new DbHelper(getBaseContext());
+                db.delete(id);
+                db.close();
+                //getSupportLoaderManager().restartLoader(LOADER_ID, null, MainActivity.this);
+            }
+
+            @Override
+            public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                return viewHolder instanceof MedListAdapter.ViewHolderMonth ? 0 : super.getSwipeDirs(recyclerView, viewHolder);
+            }
+
+        }).attachToRecyclerView(mRecyclerView);
+
+
+        db = new DbHelper(getBaseContext());
         List<RecyclerItem> info = db.read();
         if(info != null){adapter.swapItems(info);}
         db.close();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-
-        SearchView searchView;
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false);
-        //searchView.setSubmitButtonEnabled(true);
-        searchView.setOnQueryTextListener(this);
-
-        /*
-        getMenuInflater().inflate(R.menu.detail, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_share);
-        menuItem.setIntent(createShareForecastIntent());
-        return true;
-*/
-
-        return true;
+    public void onStart(){
+        super.onStart();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home: finish(); return true;
-            //case R.id.action_search: return true;
-            case R.id.action_edit_profile: return true;
-            case R.id.action_logout: signOut(); return true;
-            default:return super.onOptionsItemSelected(item);
-        }
+    public void onPause() {
+        super.onPause();
+        //db.close();
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        mSearchView.setTranslationY(verticalOffset);
+    }
+
+    private void setupSearchBar() {
+
+        mSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
+            @Override
+            public void onSearchTextChanged(String oldQuery, final String newQuery) {
+                adapter.getFilter().filter(newQuery);
+            }
+        });
+
+        //handle menu clicks the same way as you would in a regular activity
+        mSearchView.setOnMenuItemClickListener(new FloatingSearchView.OnMenuItemClickListener() {
+            @Override
+            public void onActionMenuItemSelected(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_edit_profile: break;
+                    //case R.id.action_share: item.setIntent(createShareForecastIntent()); break;
+                    case R.id.action_logout: signOut(); break;
+                }
+            }
+        });
+
+        //use this listener to listen to menu clicks when app:floatingSearch_leftAction="showHome"
+        mSearchView.setOnHomeActionClickListener(new FloatingSearchView.OnHomeActionClickListener() {
+            @Override
+            public void onHomeClicked() {
+                MainActivity.super.onBackPressed();
+            }
+        });
+
     }
 
     private void signOut() {
@@ -233,14 +270,4 @@ public class MainActivity extends AppCompatActivity
         adapter.swapItems(null);
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newQuery) {
-        adapter.getFilter().filter(newQuery);
-        return true;
-    }
 }

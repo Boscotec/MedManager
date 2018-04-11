@@ -7,13 +7,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.boscotec.medmanager.R;
 import com.boscotec.medmanager.interfaces.RecyclerItem;
@@ -59,21 +55,19 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        //return items.get(position).getRecyclerItemType();
         return filteredItems.get(position).getRecyclerItemType();
     }
 
     @Override
     public int getItemCount() {
-       // return items == null ? 0 : items.size();
         return filteredItems == null ? 0 : filteredItems.size();
     }
 
     public void swapItems(List<RecyclerItem> newItems) {
-      //  if(items != null) items.clear();
+        if(items != null) items.clear();
         if(filteredItems != null) filteredItems.clear();
 
-     //   items = newItems;
+        items = newItems;
         filteredItems = newItems;
 
         if(newItems != null){
@@ -92,14 +86,13 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
                 return new ViewHolderMonth(view);
             case RecyclerItem.TYPE_MED:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.med_info, parent, false);
-                return new ViewHolderB(view);
+                return new ViewHolderMedical(view);
         }
         return null;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        //RecyclerItem item = items.get(position);
         RecyclerItem item = filteredItems.get(position);
         if(item == null) return;
 
@@ -122,43 +115,35 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
 
         @Override
         public void onClick(View view) {
-            //RecyclerItem item = items.get(getAdapterPosition());
             RecyclerItem item = filteredItems.get(getAdapterPosition());
             if(item == null) return;
 
-            switch (view.getId()){
-                case R.id.month: mOnClickListener.onItemClick(item); break;
-                default: break;
-            }
+            mOnClickListener.onItemClick(item);
         }
 
         @Override
         public void bindType(RecyclerItem item) {
             Month adapter = (Month) item;
-
-            itemView.setTag(adapter.getId());
             mMonth.setText(adapter.getName());
         }
     }
 
-    public class ViewHolderB extends ViewHolder implements View.OnClickListener {
+    public class ViewHolderMedical extends ViewHolder implements View.OnClickListener {
         CircleImageView mDrugPix;
-        TextView mName, mDescription, mInterval, mStartDate, mEndDate;
+        TextView mName, mDescription, mInterval, mDuration;
 
-        ViewHolderB(View view){
+        ViewHolderMedical(View view){
             super(view);
-            view.setOnClickListener(this);
+            itemView.setOnClickListener(this);
             mDrugPix = view.findViewById(R.id.drugPix);
             mName = view.findViewById(R.id.name);
             mDescription = view.findViewById(R.id.description);
             mInterval = view.findViewById(R.id.interval);
-            mStartDate = view.findViewById(R.id.startDate);
-            mEndDate = view.findViewById(R.id.endDate);
+            mDuration = view.findViewById(R.id.duration);
         }
 
         @Override
         public void onClick(View view) {
-            //RecyclerItem item = items.get(getAdapterPosition());
             RecyclerItem item = filteredItems.get(getAdapterPosition());
             if(item == null) return;
 
@@ -173,9 +158,8 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
             loadImage(adapter.getDrugPix());
             mName.setText(adapter.getName());
             mDescription.setText(adapter.getDescription());
-            mInterval.setText(adapter.getInterval());
-            mStartDate.setText(adapter.getStartDate());
-            mEndDate.setText(adapter.getEndDate());
+            mInterval.setText(String.format(Locale.getDefault(), "Taken every %d hours", adapter.getInterval()));
+            mDuration.setText(String.format(Locale.getDefault(), "%s to %s", adapter.getStartDate(), adapter.getEndDate()));
         }
 
         private void loadImage(String source){
@@ -194,13 +178,13 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
                     //        return false;
                     //    }
                     //})
-                    .into(mDrugPix);
+                   .into(mDrugPix);
         }
 
     }
 
     /**
-     * Custom filter for item list
+     * Filter for item list
      * Filter content in item list according to the search text
      */
     private class SearchFilter extends Filter {

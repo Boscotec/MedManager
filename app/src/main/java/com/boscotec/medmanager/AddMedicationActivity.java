@@ -13,6 +13,8 @@ import com.boscotec.medmanager.database.DbHelper;
 import com.boscotec.medmanager.model.MedicineInfo;
 import com.shawnlin.numberpicker.NumberPicker;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -92,7 +94,10 @@ public class AddMedicationActivity extends AppCompatActivity implements View.OnC
     private void saveToDatabase(){
         if(!validated()) return;
 
-        DbHelper db = new DbHelper(this);
+        Toast.makeText(this, "Sucessful", Toast.LENGTH_SHORT).show();
+
+
+        /*DbHelper db = new DbHelper(this);
 
         Date sDate = new Date(startDate);
         mCalendar.setTime(sDate);
@@ -120,9 +125,6 @@ public class AddMedicationActivity extends AppCompatActivity implements View.OnC
         info.setEndMonth(endMonth);
         info.setEndYear(endYear);
 
-        Toast.makeText(this, String.format(Locale.getDefault(),"StartDate %d %d %d", startDay, startMonth, startYear), Toast.LENGTH_LONG).show();
-        Toast.makeText(this, String.format(Locale.getDefault(),"EndDate %d %d %d", endDay, endMonth,endYear), Toast.LENGTH_LONG).show();
-
         if(db.insert(info) > 0){
             Toast.makeText(this, "Successful", Toast.LENGTH_LONG).show();
             mName.setText("");
@@ -133,46 +135,83 @@ public class AddMedicationActivity extends AppCompatActivity implements View.OnC
             Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
         }
         db.close();
+        */
     }
 
     private boolean validated(){
-        boolean valid = true;
-
         num = mInterval.getValue();
         name = mName.getText().toString();
         description = mDescription.getText().toString();
         startDate = mStartDate.getText().toString();
         endDate = mEndDate.getText().toString();
-
+/*
         if(TextUtils.isEmpty(name)){
             mName.setError(getString(R.string.empty_name));
-            valid = false;
+            return false;
         }else{
             mName.setError(null);
         }
 
         if(TextUtils.isEmpty(description)){
             mDescription.setError(getString(R.string.empty_description));
-            valid = false;
+            return false;
         }else{
             mDescription.setError(null);
         }
 
         if(TextUtils.isEmpty(startDate)){
             mStartDate.setError(getString(R.string.empty_field));
-            valid = false;
+            return false;
         } else{
             mStartDate.setError(null);
         }
 
         if(TextUtils.isEmpty(endDate)){
             mEndDate.setError(getString(R.string.empty_field));
-            valid = false;
+            return false;
         } else{
             mEndDate.setError(null);
         }
+*/
 
-        return valid;
+        Calendar cal = Calendar.getInstance();
+        Date currentDate = cal.getTime();
+        DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+        String formattedDateString = formatter.format(currentDate);
+        //mTodayDate.setText(formattedDateString);
+        Toast.makeText(this, formattedDateString, Toast.LENGTH_SHORT).show();
+
+
+        // Date startTime = new Date(startDate);
+      //  Toast.makeText(this, startTime.toString(), Toast.LENGTH_SHORT).show();
+
+      //  Date endTime = Calendar.getInstance().getTime();
+      //  Toast.makeText(this, endTime.toString(), Toast.LENGTH_SHORT).show();
+
+      //  Date currentTime = Calendar.getInstance().getTime();
+//        long d = Calendar.getInstance().getTimeInMillis();
+      //  Toast.makeText(this, currentTime.toString(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, String.valueOf(currentTime.getTime()), Toast.LENGTH_SHORT).show();
+
+
+        /* TODO
+        if(sDate.before(nDate)){
+            Toast.makeText(this, "Start Date can not be earlier than today", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(eDate.before(nDate)){
+            Toast.makeText(this, "End Date can not be earlier than today", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(sDate.after(eDate)){
+            Toast.makeText(this, "End date shouldn't be earlier than Start date", Toast.LENGTH_SHORT).show();
+           return false;
+        }
+        */
+
+        return true;
     }
 
 }
