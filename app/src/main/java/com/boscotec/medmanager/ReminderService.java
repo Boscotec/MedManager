@@ -1,14 +1,13 @@
 package com.boscotec.medmanager;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 
-
 public class ReminderService extends JobService {
-
     private static final String TAG = ReminderService.class.getSimpleName();
     BackgroundTask mBackgroundTask;
 
@@ -17,7 +16,7 @@ public class ReminderService extends JobService {
         Log.d(TAG, "Performing long running task in scheduled job");
         // Note: this is preformed on the main thread.
         mBackgroundTask.execute(jobParameters);
-        return true;
+        return true; //our job is still doing some work
     }
 
     // Stopping jobs if our job requires change.
@@ -40,7 +39,8 @@ public class ReminderService extends JobService {
         @Override
         protected JobParameters[] doInBackground(JobParameters... params) {
             Log.d(TAG, "carrying out task in the background");
-            // Do updating and stopping logical here.
+            Context context = ReminderService.this;
+            Utils.executeTask(context, Utils.ACTION_NOTIFICATION);
             return params;
         }
 

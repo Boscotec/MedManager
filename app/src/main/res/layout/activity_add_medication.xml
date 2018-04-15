@@ -1,0 +1,424 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?attr/actionBarSize"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:contentInsetLeft="0dp"
+        app:contentInsetStart="16dp"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="?attr/colorPrimary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_below="@+id/toolbar"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:id="@+id/add_medication_layout_top"
+        android:background="@color/primary"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/medication_title"
+            android:hint="@string/medication_title"
+            android:textSize="20sp"
+            android:lines="1"
+            android:maxLines="1"
+            android:gravity="top|start"
+            android:layout_gravity="center"
+            android:textColor="@android:color/white"
+            android:scrollHorizontally="false"
+            android:textColorHint="@color/colorWhite"
+            android:inputType="textCapWords"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/medication_description"
+            android:hint="@string/medication_description"
+            android:textSize="20sp"
+            android:lines="1"
+            android:maxLines="3"
+            android:gravity="top|start"
+            android:layout_gravity="center"
+            android:textColor="@android:color/white"
+            android:scrollHorizontally="false"
+            android:textColorHint="@color/colorWhite"
+            android:inputType="textCapWords|textMultiLine"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/add_medication_layout_top"
+        android:background="@color/colorAccent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/start_date"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick="setStartDate">
+
+                <ImageView
+                    android:id="@+id/start_date_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_marginEnd="32dp"
+                    app:srcCompat="@drawable/ic_date_24dp"
+                    android:layout_centerVertical="true" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/start_date_icon"
+                    android:layout_toEndOf="@id/start_date_icon"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/startDate"
+                        android:textSize="15sp"
+                        android:textColor="@color/abc_primary_text_material_dark" />
+
+                    <TextView
+                        android:id="@+id/set_start_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/abc_secondary_text_material_dark" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/time"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick="setStartTime">
+
+                <ImageView
+                    android:id="@+id/time_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_marginEnd="32dp"
+                    app:srcCompat="@drawable/ic_time_24dp"
+                    android:layout_centerVertical="true"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/time_icon"
+                    android:layout_toEndOf="@id/time_icon"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/time"
+                        android:textSize="15sp"
+                        android:textColor="@color/abc_primary_text_material_dark" />
+
+                    <TextView
+                        android:id="@+id/set_start_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/abc_secondary_text_material_dark" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/end_date"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?android:attr/selectableItemBackground"
+                android:onClick="setEndDate">
+
+                <ImageView
+                    android:id="@+id/end_date_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_marginEnd="32dp"
+                    app:srcCompat="@drawable/ic_date_24dp"
+                    android:layout_centerVertical="true" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/end_date_icon"
+                    android:layout_toEndOf="@id/end_date_icon"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/startDate"
+                        android:textSize="15sp"
+                        android:textColor="@color/abc_primary_text_material_dark" />
+
+                    <TextView
+                        android:id="@+id/set_end_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/abc_secondary_text_material_dark" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:id="@+id/Interval"
+                android:background="?android:attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/interval_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginRight="32dp"
+                    android:layout_marginEnd="32dp"
+                    app:srcCompat="@drawable/ic_unfold_24dp"
+                    android:layout_centerVertical="true" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/interval_icon"
+                    android:layout_toEndOf="@id/interval_icon"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:text="@string/interval"
+                        android:textColor="@color/abc_primary_text_material_dark" />
+
+                    <com.shawnlin.numberpicker.NumberPicker
+                        android:id="@+id/set_interval"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        app:np_width="150dp"
+                        app:np_height="50dp"
+                        app:np_orientation="horizontal"
+                        app:np_dividerColor="@color/colorPrimary"
+                        app:np_max="24"
+                        app:np_min="1"
+                        app:np_value="6"
+                        app:np_selectedTextColor="@color/colorWhite"
+                        app:np_selectedTextSize="30sp"
+                        app:np_textColor="@color/colorPrimary"
+                        app:np_textSize="25sp"
+                        app:np_typeface="@string/roboto_light"
+                        app:np_wheelItemCount="5"
+                        app:np_fadingEdgeEnabled="false"
+                        app:np_wrapSelectorWheel="true" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/save"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="saveToDatabase"
+                android:text="@string/save" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+
+    <!--
+        <ScrollView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_below="@id/add_reminder_layout_top"
+            android:layout_height="fill_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/details"
+                    android:id="@+id/details"
+                    android:textSize="15dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="72dp"
+                    android:textColor="@color/abc_secondary_text_material_dark"
+                    android:layout_height="72dp"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:id="@+id/repeat"
+                    android:layout_height="72dp">
+
+                    <ImageView
+                        android:id="@+id/repeat_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="32dp"
+                        android:src="@drawable/ic_sync_grey600_24dp"
+                        android:layout_centerVertical="true" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:orientation="vertical"
+                        android:id="@+id/repeat_ll"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/repeat_icon"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/repeat_text"
+                            android:textColor="@color/abc_primary_text_material_dark"
+                            android:layout_width="wrap_content"
+                            android:textSize="15dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/repeat" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:id="@+id/set_repeat"
+                            android:textSize="15dp"
+                            android:textColor="@color/abc_secondary_text_material_dark"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <Switch
+                        android:id="@+id/repeat_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginLeft="8dp"
+                        android:onClick="onSwitchRepeat"
+                        android:checked="true"
+                        android:textOn="On"
+                        android:textOff="Off"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:id="@+id/RepeatType"
+                    android:clickable="true"
+                    android:onClick="selectRepeatType"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_height="72dp">
+
+                    <ImageView
+                        android:id="@+id/repeat_type_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="32dp"
+                        android:src="@drawable/ic_subject_grey600_24dp"
+                        android:layout_centerVertical="true" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/repeat_type_icon"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/repeat_type_text"
+                            android:textColor="@color/abc_primary_text_material_dark"
+                            android:layout_width="wrap_content"
+                            android:textSize="15dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/repeat_type" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:id="@+id/set_repeat_type"
+                            android:textSize="15dp"
+                            android:textColor="@color/abc_secondary_text_material_dark"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
+    -->
+</RelativeLayout>

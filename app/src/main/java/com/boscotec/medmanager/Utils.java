@@ -24,6 +24,8 @@ import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
 
 public class Utils {
+    // Constant Intent String
+    public static final String EXTRA_ID = "ID";
 
     public static void hideKeyboard(Context context) {
         InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -91,24 +93,6 @@ public class Utils {
         notificationManager.notify(notId, builder.build());
     }
 
-    public static String getMonthString(int month){
-        switch(month){
-            case 0: return "JANUARY";
-            case 1: return "FEBRUARY";
-            case 2: return "MARCH";
-            case 3: return "APRIL";
-            case 4: return "MAY";
-            case 5: return "JUNE";
-            case 6: return "JULY";
-            case 7: return "AUGUST";
-            case 8: return "SEPTEMBER";
-            case 9: return "OCTOBER";
-            case 10: return "NOVEMBER";
-            case 11: return "DECEMBER";
-        }
-        return "";
-    }
-
     private static boolean sInitialized;
     synchronized public static void scheduleReminder(@NonNull final Context context){
         if(sInitialized) return;
@@ -134,7 +118,7 @@ public class Utils {
                 //overwrite an existing job with the same tag
                 .setReplaceCurrent(true)
                 //retry with exponential backoff
-                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                //.setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
                 //constraints that need to be satisfied for the job to run
                 //.setConstraints(
                         //only run when charging
@@ -151,9 +135,8 @@ public class Utils {
         sInitialized = true;
     }
 
-
-
-
-
-
+    public static final String ACTION_NOTIFICATION = "notification";
+    public static void executeTask(Context context, String action){
+        if(ACTION_NOTIFICATION.equals(action)) showNotification(0, context, "Notification", "Reminder", R.mipmap.ic_launcher_round);
+    }
 }

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.boscotec.medmanager">
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,18 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"/>
-
-
-        <!--
-        android:launchMode="singleTop">
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-        -->
-        <activity android:name=".AddMedicationActivity"/>
+        <activity android:name=".MedicationAddActivity"/>
+        <activity android:name=".ReminderAddActivity"/>
         <activity android:name=".ProfileActivity"/>
         <activity android:name=".LoginActivity">
             <intent-filter>
@@ -37,6 +29,15 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
             </intent-filter>
         </service>
+
+
+
+        <receiver android:name=".AlarmReceiver"/>
+        <receiver android:name=".BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

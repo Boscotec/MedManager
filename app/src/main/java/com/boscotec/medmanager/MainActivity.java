@@ -1,7 +1,6 @@
 package com.boscotec.medmanager;
 
 import android.content.Intent;
-import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
@@ -32,43 +31,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Johnbosco on 21-Mar-18.
  */
-
-/*
-MD5:  87:25:5B:89:76:D2:26:E3:74:1F:4F:B9:4E:3C:C1:EC
-        SHA1: 1A:11:45:01:C4:7D:ED:6A:53:FB:91:CB:6E:4A:27:F0:FC:C3:F8:0F
-        SHA256: F1:99:57:9E:A2:53:34:73:C0:A1:D3:90:1D:B4:BC:7D:41:14:E6:43:BD:80:67:F7:64:37:2C:23:B3:7D:E9:52
-
-        client id
-        728485456501-31e8a5tb090a50376hn7lsis8s1rt0k1.apps.googleusercontent.com
-
-        Client secret
-        CW_0opZd1roqtvP5Z9gubC4Z
-
-        keytool -exportcert -list -v -alias <your-key-name> -keystore <path-to-production-keystore>
-        keytool -exportcert -list -v -alias androiddebugkey -keystore %USERPROFILE%\.android\debug.keystore
-
-        gradlew lint
-*/
-/*
-  Intent shareIntent = ShareCompat.IntentBuilder.from(this)
-          .setType("text/plain")
-          .setText(mForecast + FORECAST_SHARE_HASHTAG)
-          .getIntent();
-          return shareIntent;
-          */
-
-// You can also get the user's email address with getEmail,
-// the user's Google ID(for client-side use) with getId,
-// and an ID token for the user with with getIdToken.
-// If you need to pass the currently signed-in user to a backend server,
-// send the ID token to your backend server and validate the token on the server.
-
 public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener,
        LoaderManager.LoaderCallbacks<List<RecyclerItem>>, MedListAdapter.ListItemClickListener {
 
@@ -78,7 +45,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
     private FloatingSearchView mSearchView;
     private static final int LOADER_ID = 1;
-    private DbHelper db;
+    private LoaderManager loaderManager;
+    private Loader<List<RecyclerItem>> databaseLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), AddMedicationActivity.class));
+                startActivity(new Intent(getBaseContext(), ReminderAddActivity.class));
             }
         });
 
@@ -115,6 +83,11 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         adapter = new MedListAdapter(this, this);
         mRecyclerView.setAdapter(adapter);
 
+        loaderManager = getSupportLoaderManager();
+        databaseLoader = loaderManager.getLoader(LOADER_ID);
+        if(databaseLoader == null){ loaderManager.initLoader(LOADER_ID, null, this);}
+        else { loaderManager.restartLoader(LOADER_ID, null, this);}
+
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT| ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -124,10 +97,9 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 long id = (long) viewHolder.itemView.getTag();
-                db = new DbHelper(getBaseContext());
+                DbHelper db = new DbHelper(getBaseContext());
                 db.delete(id);
-                db.close();
-                //getSupportLoaderManager().restartLoader(LOADER_ID, null, MainActivity.this);
+                getSupportLoaderManager().restartLoader(LOADER_ID, null, MainActivity.this);
             }
 
             @Override
@@ -136,24 +108,17 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             }
 
         }).attachToRecyclerView(mRecyclerView);
-
-
-        db = new DbHelper(getBaseContext());
-        List<RecyclerItem> info = db.read();
-        if(info != null){adapter.swapItems(info);}
-        db.close();
     }
 
     @Override
-    public void onStart(){
-        super.onStart();
+    public void onResume(){
+        super.onResume();
+      //  if(databaseLoader == null){ loaderManager.initLoader(LOADER_ID, null, this);}
+      //  else { loaderManager.restartLoader(LOADER_ID, null, this);}
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        //db.close();
-    }
+    public void onPause() { super.onPause(); }
 
     @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
@@ -221,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
     @NonNull
     @Override
-    public Loader<List<RecyclerItem>> onCreateLoader(int id, @Nullable Bundle args) {
+    public Loader<List<RecyclerItem>> onCreateLoader(int id, @Nullable final Bundle args) {
         return new AsyncTaskLoader<List<RecyclerItem>>(this) {
             List<RecyclerItem> mTaskData = null;
 
@@ -240,11 +205,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             @Override
             public List<RecyclerItem> loadInBackground() {
                 try {
-
                     DbHelper db = new DbHelper(getContext());
                     List<RecyclerItem> items = db.read();
-                    //if(items != null){adapter.swapItems(items);}
-                    db.close();
                     return items;
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to asynchronously load data.");

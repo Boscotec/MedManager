@@ -16,6 +16,7 @@ public class MedicineInfo implements RecyclerItem {
     private int interval;
     private int startDay, startMonth, startYear;
     private int endDay, endMonth, endYear;
+    private int timeHour, timeMinute;
 
     public MedicineInfo(){}
 
@@ -51,6 +52,12 @@ public class MedicineInfo implements RecyclerItem {
     public int getEndYear() {
         return endYear;
     }
+    public int getTimeHour() {
+        return timeHour;
+    }
+    public int getTimeMinute() {
+        return timeMinute;
+    }
     public String getStartDate() {
         Calendar mCalendar = Calendar.getInstance();
         mCalendar.set(startYear, startMonth, startDay);
@@ -78,6 +85,8 @@ public class MedicineInfo implements RecyclerItem {
     public void setEndDay(int day) {this.endDay = day;}
     public void setEndMonth(int month) {this.endMonth = month;}
     public void setEndYear(int year) {this.endYear = year;}
+    public void setTimeHour(int hour) {this.timeHour = hour;}
+    public void setTimeMinute(int minute) {this.timeMinute = minute;}
 
     @Override
     public int getRecyclerItemType() {
