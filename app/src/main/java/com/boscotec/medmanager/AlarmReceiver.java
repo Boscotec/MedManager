@@ -18,14 +18,13 @@ import com.boscotec.medmanager.model.MedicineInfo;
 
 import java.util.Calendar;
 
-
 public class AlarmReceiver extends WakefulBroadcastReceiver {
     AlarmManager mAlarmManager;
     PendingIntent mPendingIntent;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int mReceivedID = Integer.parseInt(intent.getStringExtra(Utils.EXTRA_ID));
+        int mReceivedID = Integer.parseInt(intent.getStringExtra(TimeUtils.EXTRA_ID));
 
         // Get notification title from Database
         DbHelper db = new DbHelper(context);
@@ -34,7 +33,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
         // Create intent to open MainActivity on notification click
         Intent editIntent = new Intent(context, MainActivity.class);
-        editIntent.putExtra(Utils.EXTRA_ID, Integer.toString(mReceivedID));
+        editIntent.putExtra(TimeUtils.EXTRA_ID, Integer.toString(mReceivedID));
         PendingIntent mClick = PendingIntent.getActivity(context, mReceivedID, editIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Create Notification
@@ -58,7 +57,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
         // Put ID in Intent Extra
         Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra(Utils.EXTRA_ID, Integer.toString(ID));
+        intent.putExtra(TimeUtils.EXTRA_ID, Integer.toString(ID));
         mPendingIntent = PendingIntent.getBroadcast(context, ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Calculate notification time
@@ -82,7 +81,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
         // Put Reminder ID in Intent Extra
         Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra(Utils.EXTRA_ID, Integer.toString(ID));
+        intent.putExtra(TimeUtils.EXTRA_ID, Integer.toString(ID));
         mPendingIntent = PendingIntent.getBroadcast(context, ID, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Calculate notification time in

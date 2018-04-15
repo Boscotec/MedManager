@@ -13,7 +13,6 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"/>
         <activity android:name=".MedicationAddActivity"/>
-        <activity android:name=".ReminderAddActivity"/>
         <activity android:name=".ProfileActivity"/>
         <activity android:name=".LoginActivity">
             <intent-filter>
@@ -21,16 +20,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name=".ReminderService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
-            </intent-filter>
-        </service>
-
-
 
         <receiver android:name=".AlarmReceiver"/>
         <receiver android:name=".BootReceiver">

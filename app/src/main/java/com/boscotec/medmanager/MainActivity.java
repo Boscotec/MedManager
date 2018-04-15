@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), ReminderAddActivity.class));
+                startActivity(new Intent(getBaseContext(), MedicationAddActivity.class));
             }
         });
 

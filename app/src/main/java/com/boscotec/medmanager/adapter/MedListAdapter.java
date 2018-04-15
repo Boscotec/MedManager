@@ -9,8 +9,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.boscotec.medmanager.R;
 import com.boscotec.medmanager.interfaces.RecyclerItem;
 import com.boscotec.medmanager.model.MedicineInfo;
@@ -20,8 +23,6 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by Johnbosco on 24-Mar-18.
@@ -64,16 +65,18 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
     }
 
     public void swapItems(List<RecyclerItem> newItems) {
+        if(newItems == null) return;
+
         if(items != null) items.clear();
         if(filteredItems != null) filteredItems.clear();
 
         items = newItems;
         filteredItems = newItems;
 
-        if(newItems != null){
+        //if(newItems != null){
             // Force the RecyclerView to refresh
             this.notifyDataSetChanged();
-        }
+       // }
     }
 
     @Override
@@ -129,13 +132,15 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
     }
 
     public class ViewHolderMedical extends ViewHolder implements View.OnClickListener {
-        CircleImageView mDrugPix;
+        ImageView mThumbnailImage;
         TextView mName, mDescription, mInterval, mDuration;
+        ColorGenerator mColorGenerator = ColorGenerator.DEFAULT;
+        TextDrawable mDrawableBuilder;
 
-        ViewHolderMedical(View view){
+        ViewHolderMedical(View view) {
             super(view);
             itemView.setOnClickListener(this);
-            mDrugPix = view.findViewById(R.id.drugPix);
+            mThumbnailImage = view.findViewById(R.id.drugPix);
             mName = view.findViewById(R.id.name);
             mDescription = view.findViewById(R.id.description);
             mInterval = view.findViewById(R.id.interval);
@@ -145,7 +150,7 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
         @Override
         public void onClick(View view) {
             RecyclerItem item = filteredItems.get(getAdapterPosition());
-            if(item == null) return;
+            if (item == null) return;
 
             mOnClickListener.onItemClick(item);
         }
@@ -162,25 +167,30 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
             mDuration.setText(String.format(Locale.getDefault(), "%s to %s", adapter.getStartDate(), adapter.getEndDate()));
         }
 
-        private void loadImage(String source){
-            if(TextUtils.isEmpty(source)) return;
+        private void loadImage(String title) {
+            // Glide.with(context).load(source)
+            //.listener(new RequestListener<Drawable>() {
+            //    @Override
+            //    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+            //        return false;
+            //    }
 
-            Glide.with(context).load(source)
-                    //TODO 1 include listener
-                    //.listener(new RequestListener<Drawable>() {
-                    //    @Override
-                    //    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                    //        return false;
-                    //    }
+            //    @Override
+            //    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+            //        return false;
+            //    }
+            //})
+            ///      .into(mDrugPix);
 
-                    //    @Override
-                    //    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                    //        return false;
-                    //    }
-                    //})
-                   .into(mDrugPix);
+            String letter = "A";
+            if (!TextUtils.isEmpty(title))
+                letter = title.substring(0, 1);
+            int color = mColorGenerator.getRandomColor();
+
+            // Create a circular icon consisting of  a random background colour and first letter of title
+            mDrawableBuilder = TextDrawable.builder().buildRound(letter, color);
+            mThumbnailImage.setImageDrawable(mDrawableBuilder);
         }
-
     }
 
     /**

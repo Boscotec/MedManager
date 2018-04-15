@@ -6,32 +6,24 @@ import android.content.Intent;
 
 import com.boscotec.medmanager.database.DbHelper;
 import com.boscotec.medmanager.interfaces.RecyclerItem;
+import com.boscotec.medmanager.model.MedicineInfo;
 
 import java.util.Calendar;
 import java.util.List;
 
+import static com.boscotec.medmanager.TimeUtils.milHour;
+
 
 public class BootReceiver extends BroadcastReceiver {
-/*
-    private String mTitle;
-    private String mTime;
-    private String mDate;
-    private String mRepeatNo;
-    private String mRepeatType;
-    private String mActive;
-    private String mRepeat;
-    private String[] mDateSplit;
-    private String[] mTimeSplit;
-    private int mYear, mMonth, mHour, mMinute, mDay, mReceivedID;
-    private long mRepeatTime;
 
-    // Constant values in milliseconds
-    private static final long milMinute = 60000L;
-    private static final long milHour = 3600000L;
-    private static final long milDay = 86400000L;
-    private static final long milWeek = 604800000L;
-    private static final long milMonth = 2592000000L;
-*/
+    private int mYear, mMonth, mHour, mMinute, mDay;
+    private long mReceivedID;
+    private String mTitle;
+    private String mDescription;
+    private String mStartDate;
+    private String mEndDate;
+    private String mTime;
+    private int mInterval;
 
     private Calendar mCalendar;
     private AlarmReceiver mAlarmReceiver;
@@ -47,58 +39,33 @@ public class BootReceiver extends BroadcastReceiver {
             List<RecyclerItem> items = db.read();
 
             for (RecyclerItem rm : items) {
+                MedicineInfo info = ((MedicineInfo) rm);
 
-                /*
-                mReceivedID = rm.getID();
-                mRepeat = rm.getRepeat();
-                mRepeatNo = rm.getRepeatNo();
-                mRepeatType = rm.getRepeatType();
-                mActive = rm.getActive();
-                mDate = rm.getDate();
-                mTime = rm.getTime();
+                mReceivedID = info.getId();
+                mTitle = info.getName();
+                mDescription = info.getDescription();
+                mStartDate = info.getStartDate();
+                mEndDate = info.getEndDate();
+                //mTime =
 
-                mDateSplit = mDate.split("/");
-                mTimeSplit = mTime.split(":");
+                mHour = info.getTimeHour();
+                mMinute = info.getTimeMinute();
 
-                mDay = Integer.parseInt(mDateSplit[0]);
-                mMonth = Integer.parseInt(mDateSplit[1]);
-                mYear = Integer.parseInt(mDateSplit[2]);
-                mHour = Integer.parseInt(mTimeSplit[0]);
-                mMinute = Integer.parseInt(mTimeSplit[1]);
+                mInterval = info.getInterval() * (int) milHour;
 
-                mCalendar.set(Calendar.MONTH, --mMonth);
-                mCalendar.set(Calendar.YEAR, mYear);
-                mCalendar.set(Calendar.DAY_OF_MONTH, mDay);
+                // mCalendar.set(Calendar.MONTH, mMonth);
+                // mCalendar.set(Calendar.YEAR, mYear);
+                // mCalendar.set(Calendar.DAY_OF_MONTH, mDay);
                 mCalendar.set(Calendar.HOUR_OF_DAY, mHour);
                 mCalendar.set(Calendar.MINUTE, mMinute);
                 mCalendar.set(Calendar.SECOND, 0);
 
                 // Cancel existing notification of the reminder by using its ID
-                // mAlarmReceiver.cancelAlarm(context, mReceivedID);
-
-                // Check repeat type
-                if (mRepeatType.equals("Minute")) {
-                    mRepeatTime = Integer.parseInt(mRepeatNo) * milMinute;
-                } else if (mRepeatType.equals("Hour")) {
-                    mRepeatTime = Integer.parseInt(mRepeatNo) * milHour;
-                } else if (mRepeatType.equals("Day")) {
-                    mRepeatTime = Integer.parseInt(mRepeatNo) * milDay;
-                } else if (mRepeatType.equals("Week")) {
-                    mRepeatTime = Integer.parseInt(mRepeatNo) * milWeek;
-                } else if (mRepeatType.equals("Month")) {
-                    mRepeatTime = Integer.parseInt(mRepeatNo) * milMonth;
-                }
+                // mAlarmReceiver.cancelAlarm(context, (int) mReceivedID);
 
                 // Create a new notification
-                if (mActive.equals("true")) {
-                    if (mRepeat.equals("true")) {
-                        mAlarmReceiver.setRepeatAlarm(context, mCalendar, mReceivedID, mRepeatTime);
-                    } else if (mRepeat.equals("false")) {
-                        mAlarmReceiver.setAlarm(context, mCalendar, mReceivedID);
-                    }
-                }
-                */
-
+                // mAlarmReceiver.setRepeatAlarm(context, mCalendar,(int) mReceivedID, mInterval);
+                // mAlarmReceiver.setAlarm(context, mCalendar, (int) mReceivedID);
             }
         }
     }

@@ -23,15 +23,18 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
 
+import static com.boscotec.medmanager.TimeUtils.milHour;
+import static com.boscotec.medmanager.TimeUtils.milMinute;
 
-public class ReminderAddActivity extends AppCompatActivity {
+
+public class MedicationAddActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private EditText mTitleText, mDescriptionText;
     private TextView mStartDateText, mTimeText, mEndDateText;
     private NumberPicker mInterval;
     private Calendar startCalender, endCalender;
-    private int mYear, mMonth, mDay, mHour, mMinute;
+    private int mYear, mMonth, mDay, mHour, mMinute, interval;
     private String mTitle;
     private String mDescription;
     private String mStartDate;
@@ -187,6 +190,8 @@ public class ReminderAddActivity extends AppCompatActivity {
     }
 
     private boolean validated(){
+        interval = mInterval.getValue();
+
         mTitle = mTitleText.getText().toString();
         if (TextUtils.isEmpty(mTitle)){
              mTitleText.setError(getString(R.string.empty_title));
@@ -248,7 +253,7 @@ public class ReminderAddActivity extends AppCompatActivity {
         info.setName(mTitle);
         info.setDescription(mDescription);
         info.setDrugPix(null);
-        info.setInterval(mInterval.getValue());
+        info.setInterval(interval);
 
         info.setStartDay(startCalender.get(Calendar.DAY_OF_MONTH));
         info.setStartMonth(startCalender.get(Calendar.MONTH));
@@ -276,13 +281,8 @@ public class ReminderAddActivity extends AppCompatActivity {
             mCalendar.set(Calendar.SECOND, 0);
 
             // Create a new notification
-            //if (mActive.equals("true")) {
-            //    if (mRepeat.equals("true")) {
-             //       new AlarmReceiver().setRepeatAlarm(getApplicationContext(), mCalendar, ID, mRepeatTime);
-            //    } else if (mRepeat.equals("false")) {
-                    new AlarmReceiver().setAlarm(getApplicationContext(), mCalendar, (int) ID);
-            //    }
-            //}
+            // new AlarmReceiver().setRepeatAlarm(getApplicationContext(), mCalendar, (int) ID, interval * milHour);
+            // new AlarmReceiver().setAlarm(getApplicationContext(), mCalendar, (int) ID);
 
             Toast.makeText(getApplicationContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
             //onBackPressed();

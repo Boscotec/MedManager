@@ -9,6 +9,13 @@ import java.util.HashMap;
 import java.util.Locale;
 
 public class TimeUtils {
+    public static final String EXTRA_ID = "ID";
+    // Constant values in milliseconds
+    public static final long milMinute = 60000L;
+    public static final long milHour = 3600000L;
+    public static final long milDay = 86400000L;
+    public static final long milWeek = 604800000L;
+    public static final long milMonth = 2592000000L;
 
     public static String formatDateString(String dateString) {
         return dateString.replace('-', '/');
