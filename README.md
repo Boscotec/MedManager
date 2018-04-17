@@ -18,3 +18,5 @@ intake of the prescribed medication intake .
 5. Users receives reminder when it is time to take the medication.
 6. All saved medication intake are categorized by month.
 7. Users can search for medication by name
+
+![Alt text](relative/path/to/img.jpg?raw=true "Title")
