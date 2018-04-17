@@ -24,8 +24,6 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import java.util.Calendar;
 
 import static com.boscotec.medmanager.TimeUtils.milHour;
-import static com.boscotec.medmanager.TimeUtils.milMinute;
-
 
 public class MedicationAddActivity extends AppCompatActivity {
 
@@ -125,18 +123,11 @@ public class MedicationAddActivity extends AppCompatActivity {
                 new DatePickerDialog.OnDateSetListener(){
                     @Override
                     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-                        // monthOfYear ++;
-                        //mDay = dayOfMonth;
-                        //mMonth = monthOfYear;
-                        //mYear = year;
-                        //mStartDate = dayOfMonth + "/" + monthOfYear + "/" + year;
+                        mYear = year; mMonth = monthOfYear; mDay = dayOfMonth;
                         mStartDate = TimeUtils.getCalenderDateString(year, monthOfYear, dayOfMonth);
                         mStartDateText.setText(mStartDate);
                     }
-                },
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
+                }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)
         );
         dpd.show(getFragmentManager(), "Datepickerdialog");
     }
@@ -148,18 +139,10 @@ public class MedicationAddActivity extends AppCompatActivity {
                 new DatePickerDialog.OnDateSetListener(){
                     @Override
                     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-                        //monthOfYear ++;
-                        // mDay = dayOfMonth;
-                        // mMonth = monthOfYear;
-                        // mYear = year;
-                        //mEndDate = dayOfMonth + "/" + monthOfYear + "/" + year;
                         mEndDate = TimeUtils.getCalenderDateString(year, monthOfYear, dayOfMonth);
                         mEndDateText.setText(mEndDate);
                     }
-                },
-                now.get(Calendar.YEAR),
-                now.get(Calendar.MONTH),
-                now.get(Calendar.DAY_OF_MONTH)
+                }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)
         );
         dpd.show(getFragmentManager(), "Datepickerdialog");
     }
@@ -171,8 +154,7 @@ public class MedicationAddActivity extends AppCompatActivity {
                 new TimePickerDialog.OnTimeSetListener(){
                     @Override
                     public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
-                       // mHour = hourOfDay;
-                       // mMinute = minute;
+                        mHour = hourOfDay; mMinute = minute;
                         if (minute < 10) {
                             mTime = hourOfDay + ":" + "0" + minute;
                         } else {
@@ -180,10 +162,7 @@ public class MedicationAddActivity extends AppCompatActivity {
                         }
                         mTimeText.setText(mTime);
                     }
-                },
-                now.get(Calendar.HOUR_OF_DAY),
-                now.get(Calendar.MINUTE),
-                false
+                }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE),false
         );
         tpd.setThemeDark(false);
         tpd.show(getFragmentManager(), "Timepickerdialog");
@@ -195,12 +174,14 @@ public class MedicationAddActivity extends AppCompatActivity {
         mTitle = mTitleText.getText().toString();
         if (TextUtils.isEmpty(mTitle)){
              mTitleText.setError(getString(R.string.empty_title));
+             mTitleText.requestFocus();
              return false;
         }
 
         mDescription = mDescriptionText.getText().toString();
         if(TextUtils.isEmpty(mDescription)){
             mDescriptionText.setError(getString(R.string.empty_description));
+            mDescriptionText.requestFocus();
             return false;
         }
 
@@ -281,12 +262,11 @@ public class MedicationAddActivity extends AppCompatActivity {
             mCalendar.set(Calendar.SECOND, 0);
 
             // Create a new notification
-            // new AlarmReceiver().setRepeatAlarm(getApplicationContext(), mCalendar, (int) ID, interval * milHour);
+             new AlarmReceiver().setRepeatAlarm(getApplicationContext(), mCalendar, (int) ID, interval * milHour);
             // new AlarmReceiver().setAlarm(getApplicationContext(), mCalendar, (int) ID);
 
             Toast.makeText(getApplicationContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
             //onBackPressed();
-            //Utils.scheduleReminder(this);
         }else{
             Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
         }

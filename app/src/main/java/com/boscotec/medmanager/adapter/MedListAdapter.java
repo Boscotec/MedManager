@@ -140,7 +140,7 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
         ViewHolderMedical(View view) {
             super(view);
             itemView.setOnClickListener(this);
-            mThumbnailImage = view.findViewById(R.id.drugPix);
+            mThumbnailImage = view.findViewById(R.id.thumbnail);
             mName = view.findViewById(R.id.name);
             mDescription = view.findViewById(R.id.description);
             mInterval = view.findViewById(R.id.interval);
@@ -160,7 +160,7 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
             MedicineInfo adapter = (MedicineInfo) item;
 
             itemView.setTag(adapter.getId());
-            loadImage(adapter.getDrugPix());
+            loadImage(adapter.getName());
             mName.setText(adapter.getName());
             mDescription.setText(adapter.getDescription());
             mInterval.setText(String.format(Locale.getDefault(), "Taken every %d hours", adapter.getInterval()));
@@ -168,20 +168,6 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
         }
 
         private void loadImage(String title) {
-            // Glide.with(context).load(source)
-            //.listener(new RequestListener<Drawable>() {
-            //    @Override
-            //    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-            //        return false;
-            //    }
-
-            //    @Override
-            //    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-            //        return false;
-            //    }
-            //})
-            ///      .into(mDrugPix);
-
             String letter = "A";
             if (!TextUtils.isEmpty(title))
                 letter = title.substring(0, 1);

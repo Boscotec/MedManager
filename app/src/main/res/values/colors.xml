@@ -6,6 +6,6 @@
     <color name="colorBlack">@android:color/black</color>
     <color name="colorWhite">@android:color/white</color>
 
-
-    <color name="primary">#37474f</color>
+    <color name="colorTextHint">@android:color/secondary_text_dark</color>
+    <color name="colorText">@android:color/secondary_text_light</color>
 </resources>

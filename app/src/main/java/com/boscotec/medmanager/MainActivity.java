@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -41,21 +42,22 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private MedListAdapter adapter;
-    private GoogleSignInAccount account = null;
+    //  private GoogleSignInAccount account = null;
+    private static final String SHARE_TAG = "MedManager";
 
     private FloatingSearchView mSearchView;
     private static final int LOADER_ID = 1;
-    private LoaderManager loaderManager;
-    private Loader<List<RecyclerItem>> databaseLoader;
+    //private LoaderManager loaderManager;
+    //private Loader<List<RecyclerItem>> databaseLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(getIntent().hasExtra("account")){
-          account = getIntent().getParcelableExtra("account");
-        }
+     //   if(getIntent().hasExtra("account")){
+     //     account = getIntent().getParcelableExtra("account");
+     //   }
 
         mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
         AppBarLayout mAppBar = (AppBarLayout) findViewById(R.id.appbar);
@@ -83,10 +85,10 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         adapter = new MedListAdapter(this, this);
         mRecyclerView.setAdapter(adapter);
 
-        loaderManager = getSupportLoaderManager();
-        databaseLoader = loaderManager.getLoader(LOADER_ID);
-        if(databaseLoader == null){ loaderManager.initLoader(LOADER_ID, null, this);}
-        else { loaderManager.restartLoader(LOADER_ID, null, this);}
+       // loaderManager = getSupportLoaderManager();
+       // databaseLoader = loaderManager.getLoader(LOADER_ID);
+       // if(databaseLoader == null){ loaderManager.initLoader(LOADER_ID, null, this);}
+       // else { loaderManager.restartLoader(LOADER_ID, null, this);}
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT| ItemTouchHelper.RIGHT) {
             @Override
@@ -112,9 +114,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
     @Override
     public void onResume(){
+        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
         super.onResume();
-      //  if(databaseLoader == null){ loaderManager.initLoader(LOADER_ID, null, this);}
-      //  else { loaderManager.restartLoader(LOADER_ID, null, this);}
     }
 
     @Override
@@ -139,8 +140,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             @Override
             public void onActionMenuItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.action_edit_profile: break;
-                    //case R.id.action_share: item.setIntent(createShareForecastIntent()); break;
+                    case R.id.action_edit_profile: editProfile(); break;
+                    case R.id.action_share: item.setIntent(createShareForecastIntent()); break;
                     case R.id.action_logout: signOut(); break;
                 }
             }
@@ -156,6 +157,18 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
     }
 
+    private void editProfile(){
+        startActivity(new Intent(getBaseContext(), ProfileActivity.class));
+    }
+
+    private Intent createShareForecastIntent(){
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain")
+                .setText(SHARE_TAG)
+                .getIntent();
+        return shareIntent;
+    }
+
     private void signOut() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -164,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         Toast.makeText(getBaseContext(), "Log out successful", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 });
     }
@@ -176,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         Toast.makeText(getBaseContext(), "Revoking access successful", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 });
     }

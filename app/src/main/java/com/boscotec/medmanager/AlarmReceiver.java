@@ -30,6 +30,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
         DbHelper db = new DbHelper(context);
         MedicineInfo info = db.read(mReceivedID);
         String mTitle = info.getName();
+        String mDescription = info.getDescription();
 
         // Create intent to open MainActivity on notification click
         Intent editIntent = new Intent(context, MainActivity.class);
@@ -38,11 +39,12 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
 
         // Create Notification
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher))
+                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_first_aid_kit))
                 .setSmallIcon(R.drawable.ic_notifications_24dp)
-                .setContentTitle(context.getResources().getString(R.string.app_name))
+                //.setContentTitle(context.getResources().getString(R.string.app_name))
+                .setContentTitle(mTitle)
                 .setTicker(mTitle)
-                .setContentText(mTitle)
+                .setContentText(mDescription)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setContentIntent(mClick)
                 .setAutoCancel(true)
@@ -116,4 +118,5 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
     }
+
 }

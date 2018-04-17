@@ -16,15 +16,23 @@
     <string name="interval">Interval</string>
     <string name="save">Save</string>
 
-    <string name="empty_title">Medication Title cannot be blank!</string>
+    <string name="empty_title">Medication title cannot be blank!</string>
     <string name="empty_description">Medication description can\'t be empty</string>
     <string name="no_date">No date!</string>
     <string name="no_time">No time!</string>
     <!--  end -->
 
-
-
-    <string name="clickHere">Click Here</string>
+    <!-- Edit Profile Activity -->
+    <string name="title_activity_profile">Edit Profile</string>
+    <string name="name">Name:</string>
+    <string name="address">Address:</string>
+    <string name="phone">Phone No:</string>
+    <string name="email">Email:</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="gender">Gender:</string>
+    <string name="select_picture_title">Get Photo From</string>
+    <!-- end  -->
 
     <!-- Font -->
     <string name="roboto_regular">sans-serif</string>
@@ -32,5 +40,8 @@
     <string name="roboto_condensed">sans-serif-condensed</string>
     <string name="roboto_thin">sans-serif-thin</string>
     <string name="roboto_medium">sans-serif-medium</string>
+    <!--  end -->
+
+    <string name="no_name">This field can\'t be empty!</string>
 
 </resources>

@@ -89,7 +89,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         /* account is valid, move to the next page @MainActivity*/
         Intent login = new Intent (this, MainActivity.class);
-        login.putExtra("account", account);
+        //login.putExtra("account", account);
         startActivity(login);
         finish();
     }

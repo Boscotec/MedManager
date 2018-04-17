@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.boscotec.medmanager.database.DbHelper;
-import com.boscotec.medmanager.interfaces.RecyclerItem;
 import com.boscotec.medmanager.model.MedicineInfo;
 
 import java.util.Calendar;
@@ -13,17 +12,11 @@ import java.util.List;
 
 import static com.boscotec.medmanager.TimeUtils.milHour;
 
-
 public class BootReceiver extends BroadcastReceiver {
 
     private int mYear, mMonth, mHour, mMinute, mDay;
+    private long mInterval;
     private long mReceivedID;
-    private String mTitle;
-    private String mDescription;
-    private String mStartDate;
-    private String mEndDate;
-    private String mTime;
-    private int mInterval;
 
     private Calendar mCalendar;
     private AlarmReceiver mAlarmReceiver;
@@ -36,35 +29,32 @@ public class BootReceiver extends BroadcastReceiver {
             mCalendar = Calendar.getInstance();
             mAlarmReceiver = new AlarmReceiver();
 
-            List<RecyclerItem> items = db.read();
+            List<MedicineInfo> items = db.readMedication();
 
-            for (RecyclerItem rm : items) {
-                MedicineInfo info = ((MedicineInfo) rm);
+            for (MedicineInfo info : items) {
 
                 mReceivedID = info.getId();
-                mTitle = info.getName();
-                mDescription = info.getDescription();
-                mStartDate = info.getStartDate();
-                mEndDate = info.getEndDate();
-                //mTime =
 
+                mYear = info.getStartYear();
+                mMonth = info.getStartMonth();
+                mDay = info.getStartDay();
                 mHour = info.getTimeHour();
                 mMinute = info.getTimeMinute();
+                mInterval = info.getInterval() * milHour;
 
-                mInterval = info.getInterval() * (int) milHour;
-
-                // mCalendar.set(Calendar.MONTH, mMonth);
-                // mCalendar.set(Calendar.YEAR, mYear);
-                // mCalendar.set(Calendar.DAY_OF_MONTH, mDay);
+                mCalendar.set(Calendar.YEAR, mYear);
+                mCalendar.set(Calendar.MONTH, mMonth);
+                mCalendar.set(Calendar.DAY_OF_MONTH, mDay);
                 mCalendar.set(Calendar.HOUR_OF_DAY, mHour);
                 mCalendar.set(Calendar.MINUTE, mMinute);
                 mCalendar.set(Calendar.SECOND, 0);
+
 
                 // Cancel existing notification of the reminder by using its ID
                 // mAlarmReceiver.cancelAlarm(context, (int) mReceivedID);
 
                 // Create a new notification
-                // mAlarmReceiver.setRepeatAlarm(context, mCalendar,(int) mReceivedID, mInterval);
+                 mAlarmReceiver.setRepeatAlarm(context, mCalendar,(int) mReceivedID, mInterval);
                 // mAlarmReceiver.setAlarm(context, mCalendar, (int) mReceivedID);
             }
         }

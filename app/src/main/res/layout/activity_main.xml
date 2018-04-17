@@ -15,9 +15,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:background="@color/light_gray"
-                app:layout_scrollFlags="scroll|enterAlways"/>
+                />
 
         </android.support.design.widget.AppBarLayout>
+
+        <!--
+        app:layout_scrollFlags="scroll|enterAlways"
+        -->
 
         <android.support.v7.widget.RecyclerView android:id="@+id/med_recycler_view" android:layout_marginTop="?attr/actionBarSize" android:layout_width="match_parent" android:layout_height="match_parent"
             android:clipToPadding="false" android:background="@null" android:paddingTop="10dp" android:paddingBottom="10dp" android:scrollbars="vertical" />
@@ -28,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@android:drawable/ic_input_add" />
+            app:srcCompat="@drawable/ic_add_24dp" />
     </android.support.design.widget.CoordinatorLayout>
 
     <com.arlib.floatingsearchview.FloatingSearchView

@@ -118,5 +118,4 @@ public class ImageSaver {
             catch (IOException io){ io.printStackTrace(); }
         }
     }
-
 }

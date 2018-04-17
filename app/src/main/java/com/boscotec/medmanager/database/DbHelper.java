@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.boscotec.medmanager.AlarmReceiver;
 import com.boscotec.medmanager.TimeUtils;
 import com.boscotec.medmanager.interfaces.RecyclerItem;
 import com.boscotec.medmanager.model.MedicineInfo;
@@ -210,6 +211,42 @@ public class DbHelper extends SQLiteOpenHelper {
         return medicineInfos;
     }
 
+    public List<MedicineInfo> readMedication(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        List<MedicineInfo> medicineInfos = new ArrayList<>();
+        Cursor cursor = db.query(MED_TABLE_NAME, null, null, null, null, null, COLUMN_START_DATE_MONTH);
+
+        // Looping through all rows and adding to list
+        if(cursor.moveToFirst()){
+            do{
+
+                MedicineInfo info = new MedicineInfo();
+                info.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
+                info.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
+                info.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
+                info.setInterval(cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)));
+                info.setDrugPix(cursor.getString(cursor.getColumnIndex(COLUMN_IMAGE)));
+
+                info.setStartDay(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)));
+                info.setStartMonth(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)));
+                info.setStartYear(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)));
+
+                info.setEndDay(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)));
+                info.setEndMonth(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)));
+                info.setEndYear(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)));
+
+                info.setTimeHour(cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)));
+                info.setTimeMinute(cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
+
+                medicineInfos.add(info);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return medicineInfos;
+    }
+
     public MedicineInfo read(long id){
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -271,7 +308,10 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public void delete(long id){
         SQLiteDatabase db = this.getReadableDatabase();
-        db.delete(MED_TABLE_NAME, COLUMN_ID+"=?", new String[]{String.valueOf(id)});
+
+        if(db.delete(MED_TABLE_NAME, COLUMN_ID+"=?", new String[]{String.valueOf(id)}) > 0){
+            new AlarmReceiver().cancelAlarm(context, (int) id);
+        }
         db.close();
     }
 }
