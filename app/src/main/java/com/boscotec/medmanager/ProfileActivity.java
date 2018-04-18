@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -31,15 +32,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
-    private GoogleSignInAccount account = null;
     private static final int IMAGE_GALLERY_REQUEST = 1;
     private static final int IMAGE_CAMERA_REQUEST = 2;
+    private GoogleSignInAccount account = null;
     private ImageView mProfilePic;
     private TextView mNameText, mAddressText, mPhoneText, mEmailText;
     private RadioGroup genderGroup;
     private Uri mFileUri;
     private String userChoosenTask;
-    private CharSequence[] items = {"Camera", "Gallery", "Cancel"};
+    private String[] items = {"Camera", "Gallery", "Cancel"};
     private String mPhone, mAddress, mName;
     private boolean isSaved;
 
@@ -50,6 +51,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
+        assert getSupportActionBar() != null;
         getSupportActionBar().setTitle(R.string.title_activity_profile);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -70,6 +72,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private void checkDb(){
         account = GoogleSignIn.getLastSignedInAccount(this);
+        assert account != null;
         String email = account.getEmail();
         String displayName = account.getDisplayName();
 
@@ -165,14 +168,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onClick(DialogInterface dialog, int chosenitem) {
                 boolean result = TimeUtils.checkStoragePermission(getApplicationContext());
-                if (items[chosenitem].equals(items[0])) {
-                    userChoosenTask = items[0].toString();
-                    if(result) photoCameraIntent();
-                } else if (items[chosenitem].equals(items[1])) {
-                    userChoosenTask =items[1].toString();
-                    if(result) photoGalleryIntent();
-                } else if (items[chosenitem].equals(items[2])) {
-                    dialog.dismiss();
+                userChoosenTask = items[chosenitem];
+                if (result) {
+                    if (items[chosenitem].equals(items[0])) {
+                        photoCameraIntent();
+                    } else if (items[chosenitem].equals(items[1])) {
+                        photoGalleryIntent();
+                    } else {
+                        dialog.dismiss();
+                    }
                 }
             }
         });
@@ -192,15 +196,14 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-
-        if(requestCode != TimeUtils.REQUEST_EXTERNAL_STORAGE_PERMISSIONS) return;
-
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if(userChoosenTask.equals(items[0].toString()))  photoCameraIntent();
-            else if(userChoosenTask.equals(items[1].toString())) photoGalleryIntent();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == TimeUtils.REQUEST_EXTERNAL_STORAGE_PERMISSIONS
+                && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            return;
+        {
+            if (userChoosenTask.equals(items[0])) photoCameraIntent();
+            else if (userChoosenTask.equals(items[1])) photoGalleryIntent();
         }
-
     }
 
     @Override
@@ -216,6 +219,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private void onCaptureImageResult(Intent data) {
         mFileUri = data.getData();
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+        assert thumbnail != null;
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
 
@@ -244,10 +248,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @SuppressWarnings("deprecation")
     private void onSelectFromGalleryResult(Intent data) {
-        mFileUri = data.getData();
         Bitmap bm=null;
         if (data != null) {
             try {
+                mFileUri = data.getData();
                 bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
             } catch (IOException e) {
                 e.printStackTrace();
