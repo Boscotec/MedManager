@@ -37,7 +37,7 @@ import java.util.List;
  * Created by Johnbosco on 21-Mar-18.
  */
 public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener,
-       LoaderManager.LoaderCallbacks<List<RecyclerItem>>, MedListAdapter.ListItemClickListener {
+       LoaderManager.LoaderCallbacks<List<RecyclerItem>> {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private MedListAdapter adapter;
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         mRecyclerView.addItemDecoration(new RecyclerItemDivider(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(false);
-        adapter = new MedListAdapter(this, this);
+        adapter = new MedListAdapter(this);
         mRecyclerView.setAdapter(adapter);
         setUp();
     }
@@ -147,10 +147,6 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
                         finish();
                     }
                 });
-    }
-
-    @Override
-    public void onItemClick(RecyclerItem item) {
     }
 
     @NonNull

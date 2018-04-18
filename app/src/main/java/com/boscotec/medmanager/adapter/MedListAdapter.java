@@ -30,7 +30,7 @@ import java.util.Locale;
 
 public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHolder> implements Filterable {
 
-    private ListItemClickListener mOnClickListener;
+    //private ListItemClickListener mOnClickListener;
     public interface ListItemClickListener {
         void onItemClick(RecyclerItem item);
     }
@@ -49,9 +49,9 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
     private List<RecyclerItem> filteredItems;
     private Context context;
 
-    public MedListAdapter(Context context, ListItemClickListener mOnClickListener){
+    public MedListAdapter(Context context/*, ListItemClickListener mOnClickListener*/){
         this.context = context;
-        this.mOnClickListener = mOnClickListener;
+        //this.mOnClickListener = mOnClickListener;
     }
 
     @Override
@@ -107,15 +107,16 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
         public abstract void bindType(RecyclerItem item);
     }
 
-    public class ViewHolderMonth extends ViewHolder implements View.OnClickListener {
+    public class ViewHolderMonth extends ViewHolder /* implements View.OnClickListener */{
         TextView mMonth;
 
         ViewHolderMonth (View view){
             super(view);
             mMonth = view.findViewById(R.id.month);
-            mMonth.setOnClickListener(this);
+            //mMonth.setOnClickListener(this);
         }
 
+        /*
         @Override
         public void onClick(View view) {
             RecyclerItem item = filteredItems.get(getAdapterPosition());
@@ -123,6 +124,7 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
 
             mOnClickListener.onItemClick(item);
         }
+        */
 
         @Override
         public void bindType(RecyclerItem item) {
@@ -131,7 +133,7 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
         }
     }
 
-    public class ViewHolderMedical extends ViewHolder implements View.OnClickListener {
+    public class ViewHolderMedical extends ViewHolder /* implements View.OnClickListener */{
         ImageView mThumbnailImage;
         TextView mName, mDescription, mInterval, mDuration;
         ColorGenerator mColorGenerator = ColorGenerator.DEFAULT;
@@ -139,7 +141,7 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
 
         ViewHolderMedical(View view) {
             super(view);
-            itemView.setOnClickListener(this);
+           // itemView.setOnClickListener(this);
             mThumbnailImage = view.findViewById(R.id.thumbnail);
             mName = view.findViewById(R.id.name);
             mDescription = view.findViewById(R.id.description);
@@ -147,6 +149,7 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
             mDuration = view.findViewById(R.id.duration);
         }
 
+        /*
         @Override
         public void onClick(View view) {
             RecyclerItem item = filteredItems.get(getAdapterPosition());
@@ -154,6 +157,7 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
 
             mOnClickListener.onItemClick(item);
         }
+        */
 
         @Override
         public void bindType(RecyclerItem item) {

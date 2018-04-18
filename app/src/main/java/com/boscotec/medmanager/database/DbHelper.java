@@ -25,16 +25,63 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-
 /**
  * Created by Johnbosco on 23-Mar-18.
  */
-
 public class DbHelper extends SQLiteOpenHelper {
     private static final String TAG = DbHelper.class.getSimpleName();
     private Context context;
     private static final String DATABASE_NAME = "MedManagerDB.db";
     private static final int DATABASE_VERSION = 1;
+
+    private static final String MED_TABLE_NAME = "table_med";
+    private static final String COLUMN_ID = "_id";
+    private static final String COLUMN_NAME = "name";
+    private static final String COLUMN_EMAIL = "email";
+    private static final String COLUMN_DESCRIPTION = "description";
+    private static final String COLUMN_INTERVAL = "interval";
+    private static final String COLUMN_START_DATE_DAY = "start_date_day";
+    private static final String COLUMN_START_DATE_MONTH = "start_date_month";
+    private static final String COLUMN_START_DATE_YEAR = "start_date_year";
+    private static final String COLUMN_END_DATE_DAY = "end_date_day";
+    private static final String COLUMN_END_DATE_MONTH = "end_date_month";
+    private static final String COLUMN_END_DATE_YEAR = "end_date_year";
+    private static final String COLUMN_TIME_HOUR = "time_hour";
+    private static final String COLUMN_TIME_MINUTES = "time_minute";
+    private static final String USER_TABLE_NAME = "table_user";
+    private static final String COLUMN_ADDRESS = "address";
+    private static final String COLUMN_PHONE = "phone";
+    private static final String COLUMN_GENDER = "gender";
+    private static final String COLUMN_PASSWORD = "password";
+    private static final String COLUMN_THUMBNAIL = "thumbnail";
+
+    private static final String CREATE_MED_TABLE = "create table "
+            + MED_TABLE_NAME + " ("
+            + COLUMN_ID + " integer primary key autoincrement , "
+            + COLUMN_NAME + " text not null , "
+            + COLUMN_DESCRIPTION + " text not null , "
+            + COLUMN_EMAIL + " text not null , "
+            + COLUMN_INTERVAL + " integer not null , "
+            + COLUMN_START_DATE_DAY + " integer not null , "
+            + COLUMN_START_DATE_MONTH + " integer not null , "
+            + COLUMN_START_DATE_YEAR + " integer not null , "
+            + COLUMN_END_DATE_DAY + " integer not null , "
+            + COLUMN_END_DATE_MONTH + " integer not null , "
+            + COLUMN_END_DATE_YEAR + " integer not null , "
+            + COLUMN_TIME_HOUR + " integer not null , "
+            + COLUMN_TIME_MINUTES + " integer not null);";
+
+    private static final String CREATE_USER_TABLE = "create table "
+            + USER_TABLE_NAME + " ("
+            + COLUMN_ID + " integer primary key autoincrement , "
+            + COLUMN_NAME + " text null , "
+            + COLUMN_EMAIL + " text null , "
+            + COLUMN_ADDRESS + " text null , "
+            + COLUMN_PASSWORD + " text null , "
+            + COLUMN_PHONE + " integer null , "
+            + COLUMN_THUMBNAIL + " text null , "
+            + COLUMN_GENDER  + " text null);";
+
 
     public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -62,10 +109,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     private void readAndExecuteSQLScript(SQLiteDatabase db, Context ctx, String fileName) {
-        if (TextUtils.isEmpty(fileName)) {
-            Log.d(TAG, "SQL script file name is empty");
-            return;
-        }
+        if (TextUtils.isEmpty(fileName)) {  Log.d(TAG, "SQL script file name is empty"); return; }
 
         Log.d(TAG, "Script found. Executing...");
         AssetManager assetManager = ctx.getAssets();
@@ -80,11 +124,8 @@ public class DbHelper extends SQLiteOpenHelper {
             Log.e(TAG, "IOException:", e);
         } finally {
             if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "IOException:", e);
-                }
+                try { reader.close(); }
+                catch (IOException e) { Log.e(TAG, "IOException:", e); }
             }
         }
     }
@@ -105,64 +146,6 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
-
-    private static final String MED_TABLE_NAME = "table_med";
-    private static final String COLUMN_ID = "_id";
-
-    private static final String COLUMN_NAME = "name";
-    private static final String COLUMN_EMAIL = "email";
-    private static final String COLUMN_DESCRIPTION = "description";
-    private static final String COLUMN_INTERVAL = "interval";
-
-    private static final String COLUMN_START_DATE_DAY = "start_date_day";
-    private static final String COLUMN_START_DATE_MONTH = "start_date_month";
-    private static final String COLUMN_START_DATE_YEAR = "start_date_year";
-
-    private static final String COLUMN_END_DATE_DAY = "end_date_day";
-    private static final String COLUMN_END_DATE_MONTH = "end_date_month";
-    private static final String COLUMN_END_DATE_YEAR = "end_date_year";
-
-    private static final String COLUMN_TIME_HOUR = "time_hour";
-    private static final String COLUMN_TIME_MINUTES = "time_minute";
-
-
-    private static final String USER_TABLE_NAME = "table_user";
-    private static final String COLUMN_ADDRESS = "address";
-    private static final String COLUMN_PHONE = "phone";
-    private static final String COLUMN_GENDER = "gender";
-    private static final String COLUMN_PASSWORD = "password";
-    private static final String COLUMN_THUMBNAIL = "thumbnail";
-
-    private static final String CREATE_MED_TABLE = "create table "
-            + MED_TABLE_NAME + " ("
-            + COLUMN_ID + " integer primary key autoincrement , "
-
-            + COLUMN_NAME + " text not null , "
-            + COLUMN_DESCRIPTION + " text not null , "
-            + COLUMN_EMAIL + " text not null , "
-            + COLUMN_INTERVAL + " integer not null , "
-
-            + COLUMN_START_DATE_DAY + " integer not null , "
-            + COLUMN_START_DATE_MONTH + " integer not null , "
-            + COLUMN_START_DATE_YEAR + " integer not null , "
-
-            + COLUMN_END_DATE_DAY + " integer not null , "
-            + COLUMN_END_DATE_MONTH + " integer not null , "
-            + COLUMN_END_DATE_YEAR + " integer not null , "
-
-            + COLUMN_TIME_HOUR + " integer not null , "
-            + COLUMN_TIME_MINUTES + " integer not null);";
-
-    private static final String CREATE_USER_TABLE = "create table "
-            + USER_TABLE_NAME + " ("
-            + COLUMN_ID + " integer primary key autoincrement , "
-            + COLUMN_NAME + " text null , "
-            + COLUMN_EMAIL + " text null , "
-            + COLUMN_ADDRESS + " text null , "
-            + COLUMN_PASSWORD + " text null , "
-            + COLUMN_PHONE + " integer null , "
-            + COLUMN_THUMBNAIL + " text null , "
-            + COLUMN_GENDER  + " text null);";
 
     public long insert(MedicineInfo info){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -257,14 +240,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)), cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
     }
 
-    public int getMedicationCount(){
-        String countQuery = "SELECT * FROM " + MED_TABLE_NAME;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery,null);
-        cursor.close();
-        return cursor.getCount();
-    }
-
     public void delete(long id){
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -274,7 +249,6 @@ public class DbHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    /* USER */
     public long insertUser(User user){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -328,7 +302,6 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public void deleteUser(long id){
         SQLiteDatabase db = this.getReadableDatabase();
-        //String email = db
         //Cursor cursor = db.query(MED_TABLE_NAME, null, COLUMN_ID+"=?", new String[]{account}, null, null, null);
 
         if(db.delete(USER_TABLE_NAME, COLUMN_ID+"=?", new String[]{String.valueOf(id)}) > 0){

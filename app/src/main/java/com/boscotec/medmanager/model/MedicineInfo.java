@@ -76,15 +76,11 @@ public class MedicineInfo implements RecyclerItem {
     public int getTimeMinute() {
         return timeMinute;
     }
-    public String getStartDate() {
+    public String getStartDate() { return convert(startYear, startMonth, startDay);}
+    public String getEndDate() { return convert(endYear, endMonth, endDay); }
+    private String convert(int year, int month, int day){
         Calendar mCalendar = Calendar.getInstance();
-        mCalendar.set(startYear, startMonth, startDay);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-        return sdf.format(mCalendar.getTime());
-    }
-    public String getEndDate() {
-        Calendar mCalendar = Calendar.getInstance();
-        mCalendar.set(endYear, endMonth, endDay);
+        mCalendar.set(year, month, day);
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
         return sdf.format(mCalendar.getTime());
     }
