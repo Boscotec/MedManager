@@ -63,51 +63,26 @@ public class MedicationAddActivity extends AppCompatActivity {
         mDay = mCalendar.get(Calendar.DATE);
 
         mCurrentDate = TimeUtils.getCalenderDateString(mYear, mMonth, mDay);
-        if (mMinute < 10) {
-            mTime = mHour + ":" + "0" + mMinute;
-        } else {
-            mTime = mHour + ":" + mMinute;
-        }
+        if (mMinute < 10) { mTime = mHour + ":" + "0" + mMinute; }
+        else { mTime = mHour + ":" + mMinute; }
 
-        // Setup Medication Title EditText
         mTitleText.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mTitle = s.toString().trim();
-                mTitleText.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { mTitle = s.toString().trim(); mTitleText.setError(null); }
+            @Override public void afterTextChanged(Editable s) {}
         });
 
-        // Setup Medication Description EditText
         mDescriptionText.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mDescription = s.toString().trim();
-                mDescriptionText.setError(null);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { mDescription = s.toString().trim(); mDescriptionText.setError(null);}
+            @Override public void afterTextChanged(Editable s) {}
         });
 
-        // Setup TextViews using values
         mStartDateText.setText(mCurrentDate);
         mEndDateText.setText(mCurrentDate);
         mTimeText.setText(mTime);
     }
 
-    // On clicking Date picker
     public void setStartDate(View v){
         Calendar now = Calendar.getInstance();
         DatePickerDialog dpd = DatePickerDialog.newInstance(
@@ -123,7 +98,6 @@ public class MedicationAddActivity extends AppCompatActivity {
         dpd.show(getFragmentManager(), "Datepickerdialog");
     }
 
-    // On clicking Date picker
     public void setEndDate(View v){
         Calendar now = Calendar.getInstance();
         DatePickerDialog dpd = DatePickerDialog.newInstance(
@@ -138,7 +112,6 @@ public class MedicationAddActivity extends AppCompatActivity {
         dpd.show(getFragmentManager(), "Datepickerdialog");
     }
 
-    // On clicking Time picker
     public void setStartTime(View v){
         Calendar now = Calendar.getInstance();
         TimePickerDialog tpd = TimePickerDialog.newInstance(

@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
     private FloatingSearchView mSearchView;
     private static final int LOADER_ID = 1;
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,19 +58,24 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         AppBarLayout mAppBar = findViewById(R.id.appbar);
         mAppBar.addOnOffsetChangedListener(this);
         setupSearchBar();
-        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), MedicationAddActivity.class));
-            }
-        });
-        RecyclerView mRecyclerView = findViewById(R.id.med_recycler_view);
+
+        mRecyclerView = findViewById(R.id.med_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new RecyclerItemDivider(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(false);
         adapter = new MedListAdapter(this, this);
         mRecyclerView.setAdapter(adapter);
+        setUp();
+    }
+
+    private void setUp(){
+        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getBaseContext(), MedicationAddActivity.class));
+            }
+        });
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT| ItemTouchHelper.RIGHT) {
             @Override
@@ -105,12 +111,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     }
 
     private void setupSearchBar() {
-
         mSearchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, final String newQuery) {
-                adapter.getFilter().filter(newQuery);
-            }
+            @Override public void onSearchTextChanged(String oldQuery, final String newQuery) { adapter.getFilter().filter(newQuery);}
         });
 
         //handle menu clicks the same way as you would in a regular activity
@@ -119,12 +121,10 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             public void onActionMenuItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_edit_profile: startActivity(new Intent(getBaseContext(), ProfileActivity.class)); break;
-                    case R.id.action_share:
-                        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                    case R.id.action_share: Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                         sharingIntent.setType("text/plain");
                         sharingIntent.putExtra(Intent.EXTRA_TEXT, SHARE_TAG);
-                        startActivity(Intent.createChooser(sharingIntent, "Share via"));
-                        break;
+                        startActivity(Intent.createChooser(sharingIntent, "Share via")); break;
                     case R.id.action_logout: signOut(); break;
                 }
             }
@@ -132,12 +132,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
         //use this listener to listen to menu clicks when app:floatingSearch_leftAction="showHome"
         mSearchView.setOnHomeActionClickListener(new FloatingSearchView.OnHomeActionClickListener() {
-            @Override
-            public void onHomeClicked() {
-                MainActivity.super.onBackPressed();
-            }
+            @Override public void onHomeClicked() { MainActivity.super.onBackPressed();}
         });
-
     }
 
     private void signOut() {
@@ -165,26 +161,14 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
             @Override
             protected void onStartLoading() {
-                if (mTaskData != null) {
-                    // Delivers any previously loaded data immediately
-                    deliverResult(mTaskData);
-                } else {
-                    // Force a new load
-                    forceLoad();
-                }
+                if (mTaskData != null) { deliverResult(mTaskData); } // Delivers any previously loaded data immediately
+                else { forceLoad(); }  // Force a new load
             }
 
             @Nullable
             @Override
             public List<RecyclerItem> loadInBackground() {
-                try {
-                    DbHelper db = new DbHelper(getContext());
-                    return db.read(account.getEmail());
-                } catch (Exception e) {
-                    Log.e(TAG, "Failed to asynchronously load data.");
-                    e.printStackTrace();
-                    return null;
-                }
+                return new DbHelper(getContext()).read(account.getEmail());
             }
 
             public void deliverResult(List<RecyclerItem> data) {

@@ -190,12 +190,13 @@ public class MedListAdapter extends RecyclerView.Adapter<MedListAdapter.ViewHold
             FilterResults filterResults = new FilterResults();
             if (constraint!=null && constraint.length()>0) {
                 List<RecyclerItem> tempItems = new ArrayList<>();
+                String query = constraint.toString().toLowerCase(Locale.getDefault());
 
                 // search content in items list
                 for(RecyclerItem item: items){
                     if(item instanceof MedicineInfo){
-                        String name = ((MedicineInfo) item).getName();
-                        if(name.toLowerCase(Locale.getDefault()).contains(constraint.toString().toLowerCase(Locale.getDefault()))){
+                        String name = ((MedicineInfo) item).getName().toLowerCase(Locale.getDefault());
+                        if(name.contains(query)){
                             tempItems.add(item);
                         }
                    }

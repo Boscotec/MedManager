@@ -6,18 +6,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -27,10 +24,6 @@ import android.widget.Toast;
 import com.boscotec.medmanager.database.DbHelper;
 import com.boscotec.medmanager.model.User;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -72,7 +65,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         findViewById(R.id.save_button).setOnClickListener(this);
         findViewById(R.id.llAddress).setOnClickListener(this);
         findViewById(R.id.llPhoneNo).setOnClickListener(this);
+        checkDb();
+    }
 
+    private void checkDb(){
         account = GoogleSignIn.getLastSignedInAccount(this);
         String email = account.getEmail();
         String displayName = account.getDisplayName();
@@ -81,17 +77,15 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         User user = db.readUser(email);
         if(user != null){
             isSaved = true;
-            if(!TextUtils.isEmpty(email)) mEmailText.setText(email);
-            if(!TextUtils.isEmpty(displayName)) mNameText.setText(displayName);
-            if(!TextUtils.isEmpty(user.getAddress())) mAddressText.setText(user.getAddress());
-            if(!TextUtils.isEmpty(String.valueOf(user.getPhone()))) mPhoneText.setText(String.valueOf(user.getPhone()));
-            //if(!TextUtils.isEmpty(user.getGender())){ }
+            mAddressText.setText(user.getAddress());
+            mPhoneText.setText(String.valueOf(user.getPhone()));
             Glide.with(this).load(user.getThumbnail()).into(mProfilePic);
         }else{
             isSaved = false;
-            if(!TextUtils.isEmpty(email)) mEmailText.setText(email);
-            if(!TextUtils.isEmpty(displayName)) mNameText.setText(displayName);
         }
+
+        mEmailText.setText(email);
+        mNameText.setText(displayName);
     }
 
     public void setTextView(String title,final int id, int textType){
@@ -199,35 +193,28 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case TimeUtils.REQUEST_EXTERNAL_STORAGE_PERMISSIONS:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(userChoosenTask.equals(items[0].toString()))
-                        photoCameraIntent();
-                    else if(userChoosenTask.equals(items[1].toString()))
-                        photoGalleryIntent();
-                }
-                break;
+
+        if(requestCode != TimeUtils.REQUEST_EXTERNAL_STORAGE_PERMISSIONS) return;
+
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if(userChoosenTask.equals(items[0].toString()))  photoCameraIntent();
+            else if(userChoosenTask.equals(items[1].toString())) photoGalleryIntent();
         }
+
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == IMAGE_GALLERY_REQUEST) {
-                mFileUri = data.getData();
-                if (mFileUri != null) onSelectFromGalleryResult(data);
-            }
-            else if (requestCode == IMAGE_CAMERA_REQUEST) {
-                mFileUri = data.getData();
-                if (mFileUri != null) onCaptureImageResult(data);
-            }
+        if (resultCode == Activity.RESULT_OK){
+            if (requestCode == IMAGE_GALLERY_REQUEST) onSelectFromGalleryResult(data);
+            else onCaptureImageResult(data);
         }
     }
 
     private void onCaptureImageResult(Intent data) {
+        mFileUri = data.getData();
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
@@ -257,6 +244,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @SuppressWarnings("deprecation")
     private void onSelectFromGalleryResult(Intent data) {
+        mFileUri = data.getData();
         Bitmap bm=null;
         if (data != null) {
             try {

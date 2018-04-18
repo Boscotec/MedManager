@@ -166,25 +166,31 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public long insert(MedicineInfo info){
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
+        ContentValues values = fetchContentValues(info);
+        return db.insert(MED_TABLE_NAME, null, values);
+    }
 
+    public int update(MedicineInfo info){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = fetchContentValues(info);
+        return db.update(MED_TABLE_NAME, values, COLUMN_ID +"=?", new String[]{String.valueOf(info.getId())});
+    }
+
+    private ContentValues fetchContentValues(MedicineInfo info){
+        ContentValues values = new ContentValues();
         values.put(COLUMN_NAME, info.getName());
         values.put(COLUMN_DESCRIPTION, info.getDescription());
         values.put(COLUMN_EMAIL, info.getEmail());
         values.put(COLUMN_INTERVAL, info.getInterval());
-
         values.put(COLUMN_START_DATE_DAY, info.getStartDay());
         values.put(COLUMN_START_DATE_MONTH, info.getStartMonth());
         values.put(COLUMN_START_DATE_YEAR, info.getStartYear());
-
         values.put(COLUMN_END_DATE_DAY, info.getEndDay());
         values.put(COLUMN_END_DATE_MONTH, info.getEndMonth());
         values.put(COLUMN_END_DATE_YEAR, info.getEndYear());
-
         values.put(COLUMN_TIME_HOUR, info.getTimeHour());
         values.put(COLUMN_TIME_MINUTES, info.getTimeMinute());
-
-        return db.insert(MED_TABLE_NAME, null, values);
+        return values;
     }
 
     public List<RecyclerItem> read(String email){
@@ -199,13 +205,7 @@ public class DbHelper extends SQLiteOpenHelper {
         if(cursor.moveToFirst()){
             do{
                 int thisMonth = cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH));
-
-                MedicineInfo info = new MedicineInfo( cursor.getLong(cursor.getColumnIndex(COLUMN_ID)), cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)),
-                        cursor.getString(cursor.getColumnIndex(COLUMN_NAME)), cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)), cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)),
-                        cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)),
-                        cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)),
-                        cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)), cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
-
+                MedicineInfo info = fetchInfoFromCursor(cursor);
                 if(lastMonth != thisMonth){
                     Month month = new Month();
                     month.setName(TimeUtils.getMonthString(thisMonth));
@@ -229,12 +229,7 @@ public class DbHelper extends SQLiteOpenHelper {
         // Looping through all rows and adding to list
         if(cursor.moveToFirst()){
             do{
-                MedicineInfo info = new MedicineInfo( cursor.getLong(cursor.getColumnIndex(COLUMN_ID)), cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)),
-                        cursor.getString(cursor.getColumnIndex(COLUMN_NAME)), cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)), cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)),
-                        cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)),
-                        cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)),
-                        cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)), cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
-
+                MedicineInfo info = fetchInfoFromCursor(cursor);
                 medicineInfos.add(info);
             } while (cursor.moveToNext());
         }
@@ -245,20 +240,21 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public MedicineInfo read(long id){
         SQLiteDatabase db = this.getReadableDatabase();
-
         Cursor cursor = db.query(MED_TABLE_NAME, null, COLUMN_ID + "=?", new String[] {String.valueOf(id)}, null, null, null, null);
 
         if (cursor != null) cursor.moveToFirst();
+        MedicineInfo info = fetchInfoFromCursor(cursor);
+        cursor.close();
 
-        MedicineInfo info = new MedicineInfo( cursor.getLong(cursor.getColumnIndex(COLUMN_ID)), cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)),
+        return info;
+    }
+
+    private MedicineInfo fetchInfoFromCursor(Cursor cursor){
+        return new MedicineInfo( cursor.getLong(cursor.getColumnIndex(COLUMN_ID)), cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)),
                 cursor.getString(cursor.getColumnIndex(COLUMN_NAME)), cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)), cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)),
                 cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)),
                 cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)),
                 cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)), cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
-
-        cursor.close();
-
-        return info;
     }
 
     public int getMedicationCount(){
@@ -269,29 +265,6 @@ public class DbHelper extends SQLiteOpenHelper {
         return cursor.getCount();
     }
 
-    public int update(MedicineInfo info){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-
-        values.put(COLUMN_NAME, info.getName());
-        values.put(COLUMN_DESCRIPTION, info.getDescription());
-        values.put(COLUMN_EMAIL, info.getEmail());
-        values.put(COLUMN_INTERVAL, info.getInterval());
-
-        values.put(COLUMN_START_DATE_DAY, info.getStartDay());
-        values.put(COLUMN_START_DATE_MONTH, info.getStartMonth());
-        values.put(COLUMN_START_DATE_YEAR, info.getStartYear());
-
-        values.put(COLUMN_END_DATE_DAY, info.getEndDay());
-        values.put(COLUMN_END_DATE_MONTH, info.getEndMonth());
-        values.put(COLUMN_END_DATE_YEAR, info.getEndYear());
-
-        values.put(COLUMN_TIME_HOUR, info.getTimeHour());
-        values.put(COLUMN_TIME_MINUTES, info.getTimeMinute());
-
-        return db.update(MED_TABLE_NAME, values, COLUMN_ID +"=?", new String[]{String.valueOf(info.getId())});
-    }
-
     public void delete(long id){
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -300,7 +273,6 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         db.close();
     }
-
 
     /* USER */
     public long insertUser(User user){
