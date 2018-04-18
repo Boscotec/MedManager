@@ -18,39 +18,15 @@ import java.util.Date;
 import java.util.Locale;
 
 public class TimeUtils {
-    public static final String EXTRA_ID = "ID";
-    public static final int REQUEST_EXTERNAL_STORAGE_PERMISSIONS = 1234;
+    static final String EXTRA_ID = "ID";
+    static final int REQUEST_EXTERNAL_STORAGE_PERMISSIONS = 1234;
 
     // Constant values in milliseconds
     public static final long milMinute = 60000L;
-    public static final long milHour = 3600000L;
+    static final long milHour = 3600000L;
     public static final long milDay = 86400000L;
     public static final long milWeek = 604800000L;
     public static final long milMonth = 2592000000L;
-
-    public static String formatDateString(String dateString) {
-        return dateString.replace('-', '/');
-    }
-
-    public static long getStartOfDay(long date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(date);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTimeInMillis();
-    }
-
-    public static long getEndOfDay(long date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(date);
-        calendar.set(Calendar.HOUR, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        calendar.set(Calendar.MILLISECOND, 999);
-        return calendar.getTimeInMillis();
-    }
 
     @SuppressLint("DefaultLocale")
     public static String formatTime(float sec) {
@@ -93,12 +69,9 @@ public class TimeUtils {
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static boolean checkStoragePermission(final Context context) {
-        int currentAPIVersion = Build.VERSION.SDK_INT;
-        if(currentAPIVersion>=android.os.Build.VERSION_CODES.M)
-        {
+        if(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
                     || ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
                 if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
                     alertBuilder.setCancelable(true);
@@ -112,16 +85,9 @@ public class TimeUtils {
                     });
                     AlertDialog alert = alertBuilder.create();
                     alert.show();
-
-                } else {
-                    ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_PERMISSIONS);
-                }
+                } else { ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_EXTERNAL_STORAGE_PERMISSIONS);}
                 return false;
-            } else {
-                return true;
-            }
-        } else {
-            return true;
-        }
+            } else { return true; }
+        } else { return true; }
     }
 }

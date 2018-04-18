@@ -14,6 +14,7 @@ import com.boscotec.medmanager.TimeUtils;
 import com.boscotec.medmanager.interfaces.RecyclerItem;
 import com.boscotec.medmanager.model.MedicineInfo;
 import com.boscotec.medmanager.model.Month;
+import com.boscotec.medmanager.model.User;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,6 +45,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "onCreate...");
         db.execSQL(CREATE_MED_TABLE);
+        db.execSQL(CREATE_USER_TABLE);
     }
 
     @Override
@@ -108,7 +110,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ID = "_id";
 
     private static final String COLUMN_NAME = "name";
-    private static final String COLUMN_IMAGE = "image";
+    private static final String COLUMN_EMAIL = "email";
     private static final String COLUMN_DESCRIPTION = "description";
     private static final String COLUMN_INTERVAL = "interval";
 
@@ -123,13 +125,21 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String COLUMN_TIME_HOUR = "time_hour";
     private static final String COLUMN_TIME_MINUTES = "time_minute";
 
+
+    private static final String USER_TABLE_NAME = "table_user";
+    private static final String COLUMN_ADDRESS = "address";
+    private static final String COLUMN_PHONE = "phone";
+    private static final String COLUMN_GENDER = "gender";
+    private static final String COLUMN_PASSWORD = "password";
+    private static final String COLUMN_THUMBNAIL = "thumbnail";
+
     private static final String CREATE_MED_TABLE = "create table "
             + MED_TABLE_NAME + " ("
             + COLUMN_ID + " integer primary key autoincrement , "
 
             + COLUMN_NAME + " text not null , "
             + COLUMN_DESCRIPTION + " text not null , "
-            + COLUMN_IMAGE + " text null , "
+            + COLUMN_EMAIL + " text not null , "
             + COLUMN_INTERVAL + " integer not null , "
 
             + COLUMN_START_DATE_DAY + " integer not null , "
@@ -143,13 +153,24 @@ public class DbHelper extends SQLiteOpenHelper {
             + COLUMN_TIME_HOUR + " integer not null , "
             + COLUMN_TIME_MINUTES + " integer not null);";
 
+    private static final String CREATE_USER_TABLE = "create table "
+            + USER_TABLE_NAME + " ("
+            + COLUMN_ID + " integer primary key autoincrement , "
+            + COLUMN_NAME + " text null , "
+            + COLUMN_EMAIL + " text null , "
+            + COLUMN_ADDRESS + " text null , "
+            + COLUMN_PASSWORD + " text null , "
+            + COLUMN_PHONE + " integer null , "
+            + COLUMN_THUMBNAIL + " text null , "
+            + COLUMN_GENDER  + " text null);";
+
     public long insert(MedicineInfo info){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_NAME, info.getName());
         values.put(COLUMN_DESCRIPTION, info.getDescription());
-        values.put(COLUMN_IMAGE, info.getDrugPix());
+        values.put(COLUMN_EMAIL, info.getEmail());
         values.put(COLUMN_INTERVAL, info.getInterval());
 
         values.put(COLUMN_START_DATE_DAY, info.getStartDay());
@@ -166,35 +187,24 @@ public class DbHelper extends SQLiteOpenHelper {
         return db.insert(MED_TABLE_NAME, null, values);
     }
 
-    public List<RecyclerItem> read(){
+    public List<RecyclerItem> read(String email){
         SQLiteDatabase db = this.getWritableDatabase();
 
         List<RecyclerItem> medicineInfos = new ArrayList<>();
         int lastMonth = -1;
-        Cursor cursor = db.query(MED_TABLE_NAME, null, null, null, null, null, COLUMN_START_DATE_MONTH);
+        Cursor cursor = db.query(MED_TABLE_NAME, null, COLUMN_EMAIL+"=?",
+                new String[]{email}, null, null, COLUMN_START_DATE_MONTH);
 
         // Looping through all rows and adding to list
         if(cursor.moveToFirst()){
             do{
                 int thisMonth = cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH));
 
-                MedicineInfo info = new MedicineInfo();
-                info.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
-                info.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
-                info.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
-                info.setInterval(cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)));
-                info.setDrugPix(cursor.getString(cursor.getColumnIndex(COLUMN_IMAGE)));
-
-                info.setStartDay(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)));
-                info.setStartMonth(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)));
-                info.setStartYear(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)));
-
-                info.setEndDay(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)));
-                info.setEndMonth(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)));
-                info.setEndYear(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)));
-
-                info.setTimeHour(cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)));
-                info.setTimeMinute(cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
+                MedicineInfo info = new MedicineInfo( cursor.getLong(cursor.getColumnIndex(COLUMN_ID)), cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)),
+                        cursor.getString(cursor.getColumnIndex(COLUMN_NAME)), cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)), cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)),
+                        cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)),
+                        cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)),
+                        cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)), cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
 
                 if(lastMonth != thisMonth){
                     Month month = new Month();
@@ -207,7 +217,6 @@ public class DbHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         cursor.close();
-
         return medicineInfos;
     }
 
@@ -215,29 +224,16 @@ public class DbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         List<MedicineInfo> medicineInfos = new ArrayList<>();
-        Cursor cursor = db.query(MED_TABLE_NAME, null, null, null, null, null, COLUMN_START_DATE_MONTH);
+        Cursor cursor = db.query(MED_TABLE_NAME, null, null, null,null, null, COLUMN_START_DATE_MONTH);
 
         // Looping through all rows and adding to list
         if(cursor.moveToFirst()){
             do{
-
-                MedicineInfo info = new MedicineInfo();
-                info.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
-                info.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
-                info.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
-                info.setInterval(cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)));
-                info.setDrugPix(cursor.getString(cursor.getColumnIndex(COLUMN_IMAGE)));
-
-                info.setStartDay(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)));
-                info.setStartMonth(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)));
-                info.setStartYear(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)));
-
-                info.setEndDay(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)));
-                info.setEndMonth(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)));
-                info.setEndYear(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)));
-
-                info.setTimeHour(cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)));
-                info.setTimeMinute(cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
+                MedicineInfo info = new MedicineInfo( cursor.getLong(cursor.getColumnIndex(COLUMN_ID)), cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)),
+                        cursor.getString(cursor.getColumnIndex(COLUMN_NAME)), cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)), cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)),
+                        cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)),
+                        cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)),
+                        cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)), cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
 
                 medicineInfos.add(info);
             } while (cursor.moveToNext());
@@ -254,23 +250,13 @@ public class DbHelper extends SQLiteOpenHelper {
 
         if (cursor != null) cursor.moveToFirst();
 
-        MedicineInfo info = new MedicineInfo();
-        info.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
-        info.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
-        info.setDescription(cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)));
-        info.setInterval(cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)));
-        info.setDrugPix(cursor.getString(cursor.getColumnIndex(COLUMN_IMAGE)));
+        MedicineInfo info = new MedicineInfo( cursor.getLong(cursor.getColumnIndex(COLUMN_ID)), cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)),
+                cursor.getString(cursor.getColumnIndex(COLUMN_NAME)), cursor.getString(cursor.getColumnIndex(COLUMN_DESCRIPTION)), cursor.getInt(cursor.getColumnIndex(COLUMN_INTERVAL)),
+                cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)),
+                cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)), cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)),
+                cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)), cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
 
-        info.setStartDay(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_DAY)));
-        info.setStartMonth(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_MONTH)));
-        info.setStartYear(cursor.getInt(cursor.getColumnIndex(COLUMN_START_DATE_YEAR)));
-
-        info.setEndDay(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_DAY)));
-        info.setEndMonth(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_MONTH)));
-        info.setEndYear(cursor.getInt(cursor.getColumnIndex(COLUMN_END_DATE_YEAR)));
-
-        info.setTimeHour(cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_HOUR)));
-        info.setTimeMinute(cursor.getInt(cursor.getColumnIndex(COLUMN_TIME_MINUTES)));
+        cursor.close();
 
         return info;
     }
@@ -289,7 +275,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         values.put(COLUMN_NAME, info.getName());
         values.put(COLUMN_DESCRIPTION, info.getDescription());
-        values.put(COLUMN_IMAGE, info.getDrugPix());
+        values.put(COLUMN_EMAIL, info.getEmail());
         values.put(COLUMN_INTERVAL, info.getInterval());
 
         values.put(COLUMN_START_DATE_DAY, info.getStartDay());
@@ -311,6 +297,70 @@ public class DbHelper extends SQLiteOpenHelper {
 
         if(db.delete(MED_TABLE_NAME, COLUMN_ID+"=?", new String[]{String.valueOf(id)}) > 0){
             new AlarmReceiver().cancelAlarm(context, (int) id);
+        }
+        db.close();
+    }
+
+
+    /* USER */
+    public long insertUser(User user){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_NAME, user.getName());
+        values.put(COLUMN_EMAIL, user.getEmail());
+        values.put(COLUMN_ADDRESS, user.getAddress());
+        values.put(COLUMN_PASSWORD, user.getPassword());
+        values.put(COLUMN_THUMBNAIL, user.getThumbnail());
+        values.put(COLUMN_PHONE, user.getPhone());
+        values.put(COLUMN_GENDER, user.getGender());
+
+        return db.insert(USER_TABLE_NAME, null, values);
+    }
+
+    public User readUser(String email){
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(USER_TABLE_NAME, null, COLUMN_EMAIL+ "=?",
+                new String[] {String.valueOf(email)}, null, null, null, null);
+
+        if (cursor != null) cursor.moveToFirst();
+
+        User user = new User();
+        user.setId(cursor.getLong(cursor.getColumnIndex(COLUMN_ID)));
+        user.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME)));
+        user.setAddress(cursor.getString(cursor.getColumnIndex(COLUMN_ADDRESS)));
+        user.setEmail(cursor.getString(cursor.getColumnIndex(COLUMN_EMAIL)));
+        user.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD)));
+        user.setPhone(cursor.getInt(cursor.getColumnIndex(COLUMN_PHONE)));
+        user.setGender(cursor.getString(cursor.getColumnIndex(COLUMN_GENDER)));
+        user.setThumbnail(cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL)));
+
+        return user;
+    }
+
+    public int updateUser(User user){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_NAME, user.getName());
+        values.put(COLUMN_EMAIL, user.getEmail());
+        values.put(COLUMN_ADDRESS, user.getAddress());
+        values.put(COLUMN_PASSWORD, user.getPassword());
+        values.put(COLUMN_THUMBNAIL, user.getThumbnail());
+        values.put(COLUMN_PHONE, user.getPhone());
+        values.put(COLUMN_GENDER, user.getGender());
+
+        return db.update(USER_TABLE_NAME, values, COLUMN_ID +"=?", new String[]{String.valueOf(user.getId())});
+    }
+
+    public void deleteUser(long id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        //String email = db
+        //Cursor cursor = db.query(MED_TABLE_NAME, null, COLUMN_ID+"=?", new String[]{account}, null, null, null);
+
+        if(db.delete(USER_TABLE_NAME, COLUMN_ID+"=?", new String[]{String.valueOf(id)}) > 0){
+           // db.delete(MED_TABLE_NAME, COLUMN_ACCOUNT+"=?", new String[]{});
         }
         db.close();
     }

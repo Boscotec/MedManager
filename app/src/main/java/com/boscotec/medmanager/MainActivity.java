@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -42,53 +41,35 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private MedListAdapter adapter;
-    //  private GoogleSignInAccount account = null;
+    private GoogleSignInAccount account = null;
     private static final String SHARE_TAG = "MedManager";
 
     private FloatingSearchView mSearchView;
     private static final int LOADER_ID = 1;
-    //private LoaderManager loaderManager;
-    //private Loader<List<RecyclerItem>> databaseLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-     //   if(getIntent().hasExtra("account")){
-     //     account = getIntent().getParcelableExtra("account");
-     //   }
-
-        mSearchView = (FloatingSearchView) findViewById(R.id.floating_search_view);
-        AppBarLayout mAppBar = (AppBarLayout) findViewById(R.id.appbar);
-
+        if(getIntent().hasExtra("account")){ account = getIntent().getParcelableExtra("account"); }
+        mSearchView = findViewById(R.id.floating_search_view);
+        AppBarLayout mAppBar = findViewById(R.id.appbar);
         mAppBar.addOnOffsetChangedListener(this);
         setupSearchBar();
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getBaseContext(), MedicationAddActivity.class));
             }
         });
-
         RecyclerView mRecyclerView = findViewById(R.id.med_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.addItemDecoration(new RecyclerItemDivider(this));
-        RecyclerView.ItemAnimator animator = new DefaultItemAnimator();
-        animator.setAddDuration(1000);
-        animator.setRemoveDuration(1000);
-        mRecyclerView.setItemAnimator(animator);
-       // mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(false);
         adapter = new MedListAdapter(this, this);
         mRecyclerView.setAdapter(adapter);
-
-       // loaderManager = getSupportLoaderManager();
-       // databaseLoader = loaderManager.getLoader(LOADER_ID);
-       // if(databaseLoader == null){ loaderManager.initLoader(LOADER_ID, null, this);}
-       // else { loaderManager.restartLoader(LOADER_ID, null, this);}
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT| ItemTouchHelper.RIGHT) {
             @Override
@@ -119,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
     }
 
     @Override
-    public void onPause() { super.onPause(); }
-
-    @Override
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
         mSearchView.setTranslationY(verticalOffset);
     }
@@ -140,8 +118,13 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             @Override
             public void onActionMenuItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.action_edit_profile: editProfile(); break;
-                    case R.id.action_share: item.setIntent(createShareForecastIntent()); break;
+                    case R.id.action_edit_profile: startActivity(new Intent(getBaseContext(), ProfileActivity.class)); break;
+                    case R.id.action_share:
+                        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                        sharingIntent.setType("text/plain");
+                        sharingIntent.putExtra(Intent.EXTRA_TEXT, SHARE_TAG);
+                        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+                        break;
                     case R.id.action_logout: signOut(); break;
                 }
             }
@@ -157,39 +140,14 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
 
     }
 
-    private void editProfile(){
-        startActivity(new Intent(getBaseContext(), ProfileActivity.class));
-    }
-
-    private Intent createShareForecastIntent(){
-        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
-                .setType("text/plain")
-                .setText(SHARE_TAG)
-                .getIntent();
-        return shareIntent;
-    }
-
     private void signOut() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        mGoogleSignInClient.signOut()
+        mGoogleSignInClient.signOut() /*.revokeAccess()*/
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         Toast.makeText(getBaseContext(), "Log out successful", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                });
-    }
-
-    private void revokeAccess() {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        mGoogleSignInClient.revokeAccess()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(getBaseContext(), "Revoking access successful", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 });
@@ -221,8 +179,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
             public List<RecyclerItem> loadInBackground() {
                 try {
                     DbHelper db = new DbHelper(getContext());
-                    List<RecyclerItem> items = db.read();
-                    return items;
+                    return db.read(account.getEmail());
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to asynchronously load data.");
                     e.printStackTrace();

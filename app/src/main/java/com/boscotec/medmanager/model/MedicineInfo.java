@@ -12,19 +12,37 @@ import java.util.Locale;
 
 public class MedicineInfo implements RecyclerItem {
     private long id;
-    private String drugPix, name, description;
+    private String email, name, description;
     private int interval;
     private int startDay, startMonth, startYear;
     private int endDay, endMonth, endYear;
     private int timeHour, timeMinute;
 
-    public MedicineInfo(){}
+    public MedicineInfo(long id, String email, String name, String description, int interval,
+                        int startDay, int startMonth, int startYear, int endDay, int endMonth, int endYear, int hour, int minute ){
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.description = description;
+        this.interval = interval;
+
+        this.startDay = startDay;
+        this.startMonth = startMonth;
+        this.startYear = startYear;
+
+        this.endDay = endDay;
+        this.endMonth = endMonth;
+        this.endYear = endYear;
+
+        this.timeHour = hour;
+        this.timeMinute = minute;
+    }
 
     //getter
     public long getId() {
         return id;
     }
-    public String getDrugPix() { return drugPix; }
+    public String getEmail() { return email; }
     public String getName() {
         return name;
     }
@@ -70,23 +88,6 @@ public class MedicineInfo implements RecyclerItem {
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
         return sdf.format(mCalendar.getTime());
     }
-
-    //setter
-    public void setId(long id) {
-        this.id = id;
-    }
-    public void setDrugPix(String drugPix) {this.drugPix = drugPix;}
-    public void setName(String name) {this.name = name;}
-    public void setDescription(String description) {this.description = description;}
-    public void setInterval(int interval) {this.interval = interval;}
-    public void setStartDay(int day) {this.startDay = day;}
-    public void setStartMonth(int month) {this.startMonth = month;}
-    public void setStartYear(int year) {this.startYear = year;}
-    public void setEndDay(int day) {this.endDay = day;}
-    public void setEndMonth(int month) {this.endMonth = month;}
-    public void setEndYear(int year) {this.endYear = year;}
-    public void setTimeHour(int hour) {this.timeHour = hour;}
-    public void setTimeMinute(int minute) {this.timeMinute = minute;}
 
     @Override
     public int getRecyclerItemType() {

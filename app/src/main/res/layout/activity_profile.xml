@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto" xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent" android:layout_height="match_parent" android:fitsSystemWindows="true">
 
     <include layout="@layout/toolbar"/>
@@ -59,10 +59,7 @@
                         android:layout_margin="@dimen/spacing_medium"
                         android:gravity="top|bottom|center_vertical|fill_vertical|center|fill"
                         android:orientation="horizontal"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:onClick="setName">
+                        android:background="?android:attr/selectableItemBackground">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -73,23 +70,24 @@
                             android:textStyle="bold"
                             android:textColor="@color/colorText"/>
 
-                        <EditText
+                        <TextView
                             android:id="@+id/name"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
                             style="@android:style/TextAppearance.Medium"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_weight="1"
-                            android:ellipsize="end"
-                            android:inputType="textPersonName"
                             android:maxLines="1"
                             android:padding="10dp"
-                            android:enabled="false"
                             android:textColor="@color/colorText" />
+
 
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/llAddress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/spacing_medium"
@@ -97,8 +95,7 @@
                         android:orientation="horizontal"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:onClick="setAddress">
+                        android:background="?android:attr/selectableItemBackground">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -109,23 +106,23 @@
                             android:textStyle="bold"
                             android:textColor="@color/colorText"/>
 
-                        <EditText
+                        <TextView
                             android:id="@+id/address"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
                             style="@android:style/TextAppearance.Medium"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_weight="1"
-                            android:ellipsize="end"
-                            android:inputType="textPersonName"
                             android:maxLines="1"
                             android:padding="10dp"
-                            android:enabled="false"
                             android:textColor="@color/colorText" />
 
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/llPhoneNo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="@dimen/spacing_medium"
@@ -133,8 +130,7 @@
                         android:orientation="horizontal"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:onClick="setPhoneNumber">
+                        android:background="?android:attr/selectableItemBackground">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -145,19 +141,17 @@
                             android:textStyle="bold"
                             android:textColor="@color/colorText"/>
 
-                        <EditText
+                        <TextView
                             android:id="@+id/phoneNo"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
                             style="@android:style/TextAppearance.Medium"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_weight="1"
-                            android:ellipsize="end"
-                            android:inputType="phone"
-                            android:maxLength="13"
                             android:maxLines="1"
                             android:padding="10dp"
-                            android:enabled="false"
                             android:textColor="@color/colorText" />
 
                     </LinearLayout>
@@ -179,18 +173,17 @@
                             android:textStyle="bold"
                             android:textColor="@color/colorText"/>
 
-                        <EditText
+                        <TextView
                             android:id="@+id/email"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
                             style="@android:style/TextAppearance.Medium"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_weight="1"
-                            android:ellipsize="end"
-                            android:inputType="textEmailAddress"
                             android:maxLines="1"
                             android:padding="10dp"
-                            android:enabled="false"
                             android:textColor="@color/colorText" />
 
                     </LinearLayout>

@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -18,13 +17,15 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.boscotec.medmanager.database.DbHelper;
+import com.boscotec.medmanager.model.User;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -34,38 +35,27 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
-
     private GoogleSignInAccount account = null;
-
     private static final int IMAGE_GALLERY_REQUEST = 1;
     private static final int IMAGE_CAMERA_REQUEST = 2;
-
-    private Toolbar mToolbar;
     private ImageView mProfilePic;
-    private EditText mNameText, mAddressText, mPhoneText, mEmailText;
+    private TextView mNameText, mAddressText, mPhoneText, mEmailText;
     private RadioGroup genderGroup;
-
-    Uri mFileUri;
+    private Uri mFileUri;
     private String userChoosenTask;
-    CharSequence[] items = {"Camera", "Gallery", "Cancel"};
+    private CharSequence[] items = {"Camera", "Gallery", "Cancel"};
+    private String mPhone, mAddress, mName;
+    private boolean isSaved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        account = GoogleSignIn.getLastSignedInAccount(this);
-        String email = account.getEmail();
-     //   String displayName = account.getDisplayName();
-      //  String url = account.getPhotoUrl().toString();
-
-        mToolbar = findViewById(R.id.toolbar);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(R.string.title_activity_profile);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -77,110 +67,97 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         mAddressText = findViewById(R.id.address);
         mPhoneText = findViewById(R.id.phoneNo);
         mEmailText = findViewById(R.id.email);
-
         genderGroup = findViewById(R.id.rg_gender);
-        Button btnSave = findViewById(R.id.save_button);
-        btnSave.setOnClickListener(this);
 
-        mEmailText.setText(email);
+        findViewById(R.id.save_button).setOnClickListener(this);
+        findViewById(R.id.llAddress).setOnClickListener(this);
+        findViewById(R.id.llPhoneNo).setOnClickListener(this);
+
+        account = GoogleSignIn.getLastSignedInAccount(this);
+        String email = account.getEmail();
+        String displayName = account.getDisplayName();
+
+        DbHelper db =  new DbHelper(this);
+        User user = db.readUser(email);
+        if(user != null){
+            isSaved = true;
+            if(!TextUtils.isEmpty(email)) mEmailText.setText(email);
+            if(!TextUtils.isEmpty(displayName)) mNameText.setText(displayName);
+            if(!TextUtils.isEmpty(user.getAddress())) mAddressText.setText(user.getAddress());
+            if(!TextUtils.isEmpty(String.valueOf(user.getPhone()))) mPhoneText.setText(String.valueOf(user.getPhone()));
+            //if(!TextUtils.isEmpty(user.getGender())){ }
+            Glide.with(this).load(user.getThumbnail()).into(mProfilePic);
+        }else{
+            isSaved = false;
+            if(!TextUtils.isEmpty(email)) mEmailText.setText(email);
+            if(!TextUtils.isEmpty(displayName)) mNameText.setText(displayName);
+        }
     }
 
-    public void setName(View view){
+    public void setTextView(String title,final int id, int textType){
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Enter Name");
+        alert.setTitle(title);
 
-        // Create EditText box to input name
+        // Create EditText box to input address
         final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setInputType(textType);
         alert.setView(input);
 
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String in = input.getText().toString();
-                if (in.length() == 0) {
-                    mNameText.setText(in);
-                }
-            }
+                if (in.length() != 0) {  ((TextView) findViewById(id)).setText(in); }}
         });
         alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // do nothing
-            }
-        });
-        alert.show();
-     }
-
-    public void setAddress(View view){
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Enter Address");
-
-        // Create EditText box to input address
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        alert.setView(input);
-
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if (input.getText().toString().length() == 0) {
-                    mAddressText.setText(input.getText().toString().trim());
-                }
-            }
-        });
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // do nothing
-            }
-        });
-        alert.show();
-    }
-
-    public void setPhoneNumber(View view){
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Enter Phone Number");
-
-        // Create EditText box to input number
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        alert.setView(input);
-
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                if (input.getText().toString().length() == 0) {
-                    mPhoneText.setText(input.getText().toString().trim());
-                }
-            }
-        });
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                // do nothing
-            }
-        });
+            public void onClick(DialogInterface dialog, int whichButton) {}});
         alert.show();
     }
 
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-            case R.id.user_photo:
-                getImageFrom();
-                break;
-            case R.id.save_button:
-                saveToDatabase();
-                break;
+            case R.id.user_photo: getImageFrom(); break;
+            case R.id.save_button: saveToDatabase(); break;
+            case R.id.llAddress: setTextView("Enter Address:", R.id.address, InputType.TYPE_CLASS_TEXT); break;
+            case R.id.llPhoneNo: setTextView("Enter Phone Number:", R.id.phoneNo, InputType.TYPE_CLASS_PHONE); break;
         }
     }
 
     private void saveToDatabase(){
         if(!validated()) return;
 
+        DbHelper db =  new DbHelper(this);
+        User user = new User();
+        user.setEmail(mEmailText.getText().toString());
+        user.setPhone(Integer.valueOf(mPhoneText.getText().toString()));
+        user.setAddress(mAddressText.getText().toString());
+        user.setName(mNameText.getText().toString());
+        user.setThumbnail(mFileUri.toString());
+
+        if(isSaved){
+            if(db.updateUser(user) > 0) Toast.makeText(getApplicationContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+        }else{
+            if(db.insertUser(user) > 0) Toast.makeText(getApplicationContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
+        }
+        db.close();
+
+
     }
 
     private boolean validated(){
-
-        String mName = mNameText.getText().toString();
+        mAddress = mAddressText.getText().toString();
         if (TextUtils.isEmpty(mName)){
-            mNameText.setError(getString(R.string.no_name));
-            mNameText.requestFocus();
+            mAddressText.setError(getString(R.string.no_name));
+            mAddressText.requestFocus();
+            return false;
+        }
+
+        mPhone = mPhoneText.getText().toString();
+        if (TextUtils.isEmpty(mName)){
+            mPhoneText.setError(getString(R.string.no_name));
+            mPhoneText.requestFocus();
             return false;
         }
 
@@ -229,8 +206,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                         photoCameraIntent();
                     else if(userChoosenTask.equals(items[1].toString()))
                         photoGalleryIntent();
-                } else {
-                    //code for deny
                 }
                 break;
         }
@@ -294,7 +269,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         mProfilePic.setImageBitmap(bm);
     }
 
-    // On clicking menu buttons
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -305,23 +279,4 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    private void loadImage(String url) {
-        if(url.length() == 0) return;
-
-        Glide.with(this).load(url)
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        return false;
-                    }
-                })
-                .into(new ImageView(this));
-    }
-
 }

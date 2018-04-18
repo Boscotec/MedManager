@@ -6,7 +6,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 
 import com.boscotec.medmanager.database.DbHelper;
 import com.boscotec.medmanager.model.MedicineInfo;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.shawnlin.numberpicker.NumberPicker;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
@@ -26,43 +26,35 @@ import java.util.Calendar;
 import static com.boscotec.medmanager.TimeUtils.milHour;
 
 public class MedicationAddActivity extends AppCompatActivity {
-
-    private Toolbar mToolbar;
     private EditText mTitleText, mDescriptionText;
     private TextView mStartDateText, mTimeText, mEndDateText;
-    private NumberPicker mInterval;
+    private NumberPicker mIntervalPicker;
     private Calendar startCalender, endCalender;
-    private int mYear, mMonth, mDay, mHour, mMinute, interval;
-    private String mTitle;
-    private String mDescription;
-    private String mStartDate;
-    private String mCurrentDate;
-    private String mTime;
-    private String mEndDate;
+    private int mYear, mMonth, mDay, mHour, mMinute;
+    private String mTitle, mDescription, mStartDate, mCurrentDate, mTime, mEndDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_medication);
 
-        // Initialize Views
-        mToolbar = findViewById(R.id.toolbar);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         mTitleText = findViewById(R.id.medication_title);
         mDescriptionText = findViewById(R.id.medication_description);
-
         mStartDateText = findViewById(R.id.set_start_date);
         mTimeText = findViewById(R.id.set_start_time);
         mEndDateText = findViewById(R.id.set_end_date);
-        mInterval = findViewById(R.id.set_interval);
-
+        mIntervalPicker = findViewById(R.id.set_interval);
         Button mSaveButton = findViewById(R.id.save);
 
-        // Setup Toolbar
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle(R.string.title_activity_add_medication);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        setUp();
+    }
 
+    private void setUp(){
         Calendar mCalendar = Calendar.getInstance();
         mHour = mCalendar.get(Calendar.HOUR_OF_DAY);
         mMinute = mCalendar.get(Calendar.MINUTE);
@@ -70,13 +62,12 @@ public class MedicationAddActivity extends AppCompatActivity {
         mMonth = mCalendar.get(Calendar.MONTH);
         mDay = mCalendar.get(Calendar.DATE);
 
-
-         mCurrentDate = TimeUtils.getCalenderDateString(mYear, mMonth, mDay);
-         if (mMinute < 10) {
+        mCurrentDate = TimeUtils.getCalenderDateString(mYear, mMonth, mDay);
+        if (mMinute < 10) {
             mTime = mHour + ":" + "0" + mMinute;
-         } else {
+        } else {
             mTime = mHour + ":" + mMinute;
-         }
+        }
 
         // Setup Medication Title EditText
         mTitleText.addTextChangedListener(new TextWatcher() {
@@ -169,89 +160,45 @@ public class MedicationAddActivity extends AppCompatActivity {
     }
 
     private boolean validated(){
-        interval = mInterval.getValue();
-
+        mStartDate = mStartDateText.getText().toString();
+        mTime = mTimeText.getText().toString();
+        mEndDate = mEndDateText.getText().toString();
         mTitle = mTitleText.getText().toString();
         if (TextUtils.isEmpty(mTitle)){
              mTitleText.setError(getString(R.string.empty_title));
              mTitleText.requestFocus();
              return false;
         }
-
         mDescription = mDescriptionText.getText().toString();
         if(TextUtils.isEmpty(mDescription)){
             mDescriptionText.setError(getString(R.string.empty_description));
             mDescriptionText.requestFocus();
             return false;
         }
-
-        mStartDate = mStartDateText.getText().toString();
-        if(TextUtils.isEmpty(mStartDate)){
-            mStartDateText.setError(getString(R.string.no_date));
-            return false;
-        }
-
-        mTime = mTimeText.getText().toString();
-        if(TextUtils.isEmpty(mTime)){
-            mTimeText.setError(getString(R.string.no_time));
-            return false;
-        }
-
-        mEndDate = mEndDateText.getText().toString();
-        if(TextUtils.isEmpty(mEndDate)){
-            mEndDateText.setError(getString(R.string.no_date));
-            return false;
-        }
-
         startCalender = TimeUtils.getCalender(mStartDate);
         endCalender = TimeUtils.getCalender(mEndDate);
         Calendar currentCalender = TimeUtils.getCalender(mCurrentDate);
 
-        if(startCalender.before(currentCalender)){
-            Toast.makeText(this, "Start Date can not be earlier than today", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if(endCalender.before(currentCalender)){
-            Toast.makeText(this, "End Date can not be earlier than today", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        if(startCalender.after(endCalender)){
-            Toast.makeText(this, "End date shouldn't be earlier than Start date", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
+        if(startCalender.before(currentCalender)){ Toast.makeText(this, "Start Date can not be earlier than today", Toast.LENGTH_SHORT).show(); return false;}
+        if(endCalender.before(currentCalender)){ Toast.makeText(this, "End Date can not be earlier than today", Toast.LENGTH_SHORT).show(); return false; }
+        if(startCalender.after(endCalender)){ Toast.makeText(this, "End date shouldn't be earlier than Start date", Toast.LENGTH_SHORT).show(); return false; }
         return true;
     }
 
     public void saveToDatabase(View v){
         if(!validated()) return;
 
+        String mEmail = GoogleSignIn.getLastSignedInAccount(this).getEmail();
         DbHelper db = new DbHelper(this);
-
-        MedicineInfo info = new MedicineInfo();
-        info.setName(mTitle);
-        info.setDescription(mDescription);
-        info.setDrugPix(null);
-        info.setInterval(interval);
-
-        info.setStartDay(startCalender.get(Calendar.DAY_OF_MONTH));
-        info.setStartMonth(startCalender.get(Calendar.MONTH));
-        info.setStartYear(startCalender.get(Calendar.YEAR));
-
-        info.setEndDay(endCalender.get(Calendar.DAY_OF_MONTH));
-        info.setEndMonth(endCalender.get(Calendar.MONTH));
-        info.setEndYear(endCalender.get(Calendar.YEAR));
-
-        info.setTimeHour(mHour);
-        info.setTimeMinute(mMinute);
+        MedicineInfo info = new MedicineInfo(0, mEmail, mTitle, mDescription, mIntervalPicker.getValue(),
+                startCalender.get(Calendar.DAY_OF_MONTH), startCalender.get(Calendar.MONTH), startCalender.get(Calendar.YEAR),
+                endCalender.get(Calendar.DAY_OF_MONTH), endCalender.get(Calendar.MONTH), endCalender.get(Calendar.YEAR),
+                mHour, mMinute);
 
         long ID = db.insert(info);
         if(ID > 0){
             mTitleText.setText("");
             mDescriptionText.setText("");
-
             // Set up calender for creating the notification
             Calendar mCalendar = Calendar.getInstance();
             mCalendar.set(Calendar.MONTH, mMonth);
@@ -260,33 +207,13 @@ public class MedicationAddActivity extends AppCompatActivity {
             mCalendar.set(Calendar.HOUR_OF_DAY, mHour);
             mCalendar.set(Calendar.MINUTE, mMinute);
             mCalendar.set(Calendar.SECOND, 0);
-
             // Create a new notification
-             new AlarmReceiver().setRepeatAlarm(getApplicationContext(), mCalendar, (int) ID, interval * milHour);
-            // new AlarmReceiver().setAlarm(getApplicationContext(), mCalendar, (int) ID);
-
+            new AlarmReceiver().setRepeatAlarm(getApplicationContext(), mCalendar, (int) ID, mIntervalPicker.getValue() * milHour);
             Toast.makeText(getApplicationContext(), "Saved Successfully", Toast.LENGTH_SHORT).show();
-            //onBackPressed();
-        }else{
-            Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
-        }
+        }else{ Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show(); }
         db.close();
     }
 
-    // On pressing the back button
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
-    // Creating the menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        //getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    // On clicking menu buttons
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -297,5 +224,4 @@ public class MedicationAddActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-
 }
