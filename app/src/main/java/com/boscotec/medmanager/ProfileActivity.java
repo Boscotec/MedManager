@@ -20,11 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.boscotec.medmanager.database.DbHelper;
-import com.boscotec.medmanager.model.User;
-import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
@@ -41,8 +37,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private Uri mFileUri;
     private String userChoosenTask;
     private String[] items = {"Camera", "Gallery", "Cancel"};
-    private String mPhone, mAddress, mName;
-    private boolean isSaved;
+    private String mPhone, mAddress;
+    private boolean isSaved = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +72,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         String email = account.getEmail();
         String displayName = account.getDisplayName();
 
+        /*
         DbHelper db =  new DbHelper(this);
         User user = db.readUser(email);
         if(user != null){
@@ -86,6 +83,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }else{
             isSaved = false;
         }
+        */
 
         mEmailText.setText(email);
         mNameText.setText(displayName);
@@ -123,6 +121,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private void saveToDatabase(){
         if(!validated()) return;
 
+        /*
         DbHelper db =  new DbHelper(this);
         User user = new User();
         user.setEmail(mEmailText.getText().toString());
@@ -139,20 +138,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             else Toast.makeText(this, "Something went wrong!", Toast.LENGTH_LONG).show();
         }
         db.close();
-
+        */
 
     }
 
     private boolean validated(){
         mAddress = mAddressText.getText().toString();
-        if (TextUtils.isEmpty(mName)){
+        if (TextUtils.isEmpty(mAddress)) {
             mAddressText.setError(getString(R.string.no_name));
             mAddressText.requestFocus();
             return false;
         }
 
         mPhone = mPhoneText.getText().toString();
-        if (TextUtils.isEmpty(mName)){
+        if (TextUtils.isEmpty(mPhone)) {
             mPhoneText.setError(getString(R.string.no_name));
             mPhoneText.requestFocus();
             return false;
@@ -197,10 +196,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == TimeUtils.REQUEST_EXTERNAL_STORAGE_PERMISSIONS
-                && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            return;
-        {
+        if (requestCode == TimeUtils.REQUEST_EXTERNAL_STORAGE_PERMISSIONS && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             if (userChoosenTask.equals(items[0])) photoCameraIntent();
             else if (userChoosenTask.equals(items[1])) photoGalleryIntent();
         }

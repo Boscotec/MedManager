@@ -1,20 +1,18 @@
 package com.boscotec.medmanager;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -37,15 +35,14 @@ import java.util.List;
  * Created by Johnbosco on 21-Mar-18.
  */
 public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener,
-       LoaderManager.LoaderCallbacks<List<RecyclerItem>> {
+        LoaderManager.LoaderCallbacks<List<RecyclerItem>>, MedListAdapter.ListItemClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String SHARE_TAG = "MedManager";
+    private static final int LOADER_ID = 1;
     private MedListAdapter adapter;
     private GoogleSignInAccount account = null;
-    private static final String SHARE_TAG = "MedManager";
-
     private FloatingSearchView mSearchView;
-    private static final int LOADER_ID = 1;
     private RecyclerView mRecyclerView;
 
     @Override
@@ -64,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         mRecyclerView.addItemDecoration(new RecyclerItemDivider(this));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(false);
-        adapter = new MedListAdapter(this);
+        adapter = new MedListAdapter(this, this);
         mRecyclerView.setAdapter(adapter);
         setUp();
     }
@@ -184,4 +181,8 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         adapter.swapItems(null);
     }
 
+    @Override
+    public void onItemClick(RecyclerItem item) {
+
+    }
 }
