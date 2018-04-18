@@ -19,4 +19,6 @@ intake of the prescribed medication intake .
 6. All saved medication intake are categorized by month.
 7. Users can search for medication by name
 
-![Alt text](relative/path/to/img.jpg?raw=true "Title")
+![Alt text](https://github.com/Boscotec/MedManager/blob/master/screenshots/Screenshot_2018-04-17-01-19-15.png?raw=true "Title")
+![Alt text](https://github.com/Boscotec/MedManager/blob/master/screenshots/Screenshot_2018-04-17-01-21-03.png?raw=true "Title")
+![Alt text](https://github.com/Boscotec/MedManager/blob/master/screenshots/Screenshot_2018-04-17-01-21-16.png?raw=true "Title")
