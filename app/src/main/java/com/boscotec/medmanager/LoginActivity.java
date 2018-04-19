@@ -16,8 +16,8 @@ import com.google.android.gms.tasks.Task;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
-    private GoogleSignInClient mGoogleSignInClient;
     private static final int RC_SIGN_IN = 123;
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +88,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         /* account is valid, move to the next page @MainActivity*/
         Intent login = new Intent (this, MainActivity.class);
-        login.putExtra("account", account);
+        //login.putExtra("account", account);
         startActivity(login);
         finish();
     }

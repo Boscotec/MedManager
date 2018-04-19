@@ -30,10 +30,8 @@ import java.util.Locale;
  */
 public class DbHelper extends SQLiteOpenHelper {
     private static final String TAG = DbHelper.class.getSimpleName();
-    private Context context;
     private static final String DATABASE_NAME = "MedManagerDB.db";
     private static final int DATABASE_VERSION = 1;
-
     private static final String MED_TABLE_NAME = "table_med";
     private static final String COLUMN_ID = "_id";
     private static final String COLUMN_NAME = "name";
@@ -54,7 +52,6 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String COLUMN_GENDER = "gender";
     private static final String COLUMN_PASSWORD = "password";
     private static final String COLUMN_THUMBNAIL = "thumbnail";
-
     private static final String CREATE_MED_TABLE = "create table "
             + MED_TABLE_NAME + " ("
             + COLUMN_ID + " integer primary key autoincrement , "
@@ -70,7 +67,6 @@ public class DbHelper extends SQLiteOpenHelper {
             + COLUMN_END_DATE_YEAR + " integer not null , "
             + COLUMN_TIME_HOUR + " integer not null , "
             + COLUMN_TIME_MINUTES + " integer not null);";
-
     private static final String CREATE_USER_TABLE = "create table "
             + USER_TABLE_NAME + " ("
             + COLUMN_ID + " integer primary key autoincrement , "
@@ -81,6 +77,7 @@ public class DbHelper extends SQLiteOpenHelper {
             + COLUMN_PHONE + " integer null , "
             + COLUMN_THUMBNAIL + " text null , "
             + COLUMN_GENDER  + " text null);";
+    private Context context;
 
 
     public DbHelper(Context context) {
@@ -281,6 +278,8 @@ public class DbHelper extends SQLiteOpenHelper {
         user.setPhone(cursor.getInt(cursor.getColumnIndex(COLUMN_PHONE)));
         user.setGender(cursor.getString(cursor.getColumnIndex(COLUMN_GENDER)));
         user.setThumbnail(cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL)));
+
+        cursor.close();
 
         return user;
     }

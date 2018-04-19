@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements AppBarLayout.OnOf
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(getIntent().hasExtra("account")){ account = getIntent().getParcelableExtra("account"); }
+        account = GoogleSignIn.getLastSignedInAccount(this);
         mSearchView = findViewById(R.id.floating_search_view);
         AppBarLayout mAppBar = findViewById(R.id.appbar);
         mAppBar.addOnOffsetChangedListener(this);
